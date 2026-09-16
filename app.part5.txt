@@ -1,0 +1,73 @@
+bd=Infinity;
+      cs.forEach((c,i)=>{const d=colorDistance(p,c);if(d<bd){bd=d;bi=i;}});
+      buckets[bi].push(p);
+    });
+    cs=cs.map((c,i)=>buckets[i].length?avg(buckets[i]):c);
+  }
+  return cs;
+}
+function hex(c){return "#"+c.map(v=>Math.max(0,Math.min(255,v)).toString(16).padStart(2,"0")).join("").toUpperCase();}
+function lum(c){return .2126*c[0]+.7152*c[1]+.0722*c[2];}
+function makePixelModel(img) {
+  const target=+document.getElementById("gridSize").value;
+  const count=+document.getElementById("colorCount").value;
+  const aspect=img.width/img.height;
+  let cols,rows;
+  if(aspect>=1){cols=target;rows=Math.max(1,Math.round(target/aspect));}
+  else{rows=target;cols=Math.max(1,Math.round(target*aspect));}
+  const temp=document.createElement("canvas");temp.width=cols;temp.height=rows;
+  const t=temp.getContext("2d",{willReadFrequently:true});t.drawImage(img,0,0,cols,rows);
+  const raw=t.getImageData(0,0,cols,rows).data;
+  const pixels=[];for(let i=0;i<raw.length;i+=4)pixels.push([raw[i],raw[i+1],raw[i+2]]);
+  let palette=refine(pixels,medianCut(pixels,count),9).sort((a,b)=>lum(a)-lum(b));
+  const assignments=pixels.map(p=>{
+    let bi=0,bd=Infinity;palette.forEach((c,i)=>{const d=colorDistance(p,c);if(d<bd){bd=d;bi=i;}});return bi;
+  });
+  return {cols,rows,palette,assignments};
+}
+function renderPixel() {
+  if(!pixelModel)return drawPixelPlaceholder();
+  const {cols,rows,palette,assignments}=pixelModel;
+  const mode=document.getElementById("pixelMode").value;
+  const cell=Math.max(12,Math.floor(768/Math.max(cols,rows)));
+  pixelCanvas.width=cols*cell;pixelCanvas.height=rows*cell;
+  pctx.textAlign="center";pctx.textBaseline="middle";
+  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
+    const idx=y*cols+x,p=assignments[idx],c=palette[p];
+    pctx.fillStyle=mode==="color"?hex(c):"#fff";pctx.fillRect(x*cell,y*cell,cell,cell);
+    pctx.strokeStyle="rgba(45,34,25,.28)";pctx.strokeRect(x*cell+.5,y*cell+.5,cell,cell);
+    if(mode==="mystery"){pctx.fillStyle="#2b211a";pctx.font=`700 ${Math.max(7,Math.floor(cell*.45))}px system-ui`;pctx.fillText(String(p+1),x*cell+cell/2,y*cell+cell/2);}
+  }
+  document.getElementById("pixelLegend").innerHTML=palette.map((c,i)=>`<div class="swatch"><div class="swatch-color" style="background:${hex(c)}"></div><small>N° ${i+1}<br>${hex(c)}</small></div>`).join("");
+  document.getElementById("pixelInfo").textContent=`${cols} × ${rows} cases • ${palette.length} couleurs • proportions conservées`;
+}
+function regenPixel() {
+  if(!pixelImage)return;
+  document.getElementById("pixelInfo").textContent="Analyse des couleurs…";
+  setTimeout(()=>{pixelModel=makePixelModel(pixelImage);renderPixel();toast("Grille générée ✓");},20);
+}
+document.getElementById("pixelUpload").addEventListener("change",e=>{
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();r.onload=ev=>{const img=new Image();img.onload=()=>{pixelImage=img;regenPixel();};img.src=ev.target.result;};r.readAsDataURL(file);
+});
+["gridSize","colorCount"].forEach(id=>document.getElementById(id).addEventListener("change",regenPixel));
+document.getElementById("pixelMode").addEventListener("change",renderPixel);
+document.getElementById("downloadPixel").addEventListener("click",()=>{
+  if(!pixelModel)return toast("Importe d’abord une photo");
+  const a=document.createElement("a");a.href=pixelCanvas.toDataURL("image/png");a.download="lion-dynasty-grille.png";a.click();
+});
+document.getElementById("printPixel").addEventListener("click",()=>{
+  if(!pixelModel)return toast("Importe d’abord une photo");
+  const old=document.getElementById("pixelMode").value;
+  document.getElementById("pixelMode").value="mystery";renderPixel();
+  const data=pixelCanvas.toDataURL("image/png");
+  const legend=pixelModel.palette.map((c,i)=>`<span style="display:inline-flex;align-items:center;gap:5px;margin:4px;padding:5px 7px;border:1px solid #ccc;border-radius:7px"><i style="width:20px;height:20px;background:${hex(c)};display:inline-block;border:1px solid #aaa"></i><b>N°${i+1}</b> ${hex(c)}</span>`).join("");
+  const w=window.open("","_blank");
+  w.document.write(`<title>Grille Lion Dynasty</title><h2>Grille mystère Lion Dynasty</h2><img src="${data}" style="max-width:100%;max-height:75vh;display:block;margin:auto"><div style="font-family:Arial;text-align:center">${legend}</div><script>onload=()=>setTimeout(()=>print(),120)<\/script>`);
+  w.document.close();
+  document.getElementById("pixelMode").value=old;renderPixel();
+});
+
+// Start
+initAuth();
+})();
