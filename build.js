@@ -25,7 +25,7 @@ for (const file of files) {
   fs.copyFileSync(file, path.join(out, file));
 }
 
-// V5.12 : placement équilibré avec davantage de codes lisibles.
+// V5.13 : davantage de codes, sans imposer une grande distance aux contours.
 const editorialPath = path.join(out, 'editorial-mode-v53.js');
 let editorial = fs.readFileSync(editorialPath, 'utf8');
 
@@ -71,7 +71,7 @@ const newLabelPoint = `function labelPoint(r,w){
     }`;
 
 if (!editorial.includes(oldLabelPoint)) {
-  throw new Error('Fonction labelPoint V5.3 introuvable : correctif V5.12 non appliqué.');
+  throw new Error('Fonction labelPoint V5.3 introuvable : correctif V5.13 non appliqué.');
 }
 editorial = editorial.replace(oldLabelPoint, newLabelPoint);
 
@@ -80,28 +80,28 @@ const oldLabels = "let labels=0;if(numbered){ctx.textAlign='center';ctx.textBase
 const newLabels = `let labels=0;if(numbered){
         ctx.textAlign='center';ctx.textBaseline='middle';
         const readability=window.__LION_LABEL_READABILITY__||'readable';
-        const minArea=readability==='xl'?7:readability==='standard'?14:9;
-        const minFont=readability==='xl'?18:readability==='standard'?11:14;
-        const maxFont=readability==='xl'?24:readability==='standard'?16:20;
-        const maxLabels=readability==='xl'?280:readability==='standard'?180:230;
+        const minArea=readability==='xl'?5:readability==='standard'?10:7;
+        const minFont=readability==='xl'?15:readability==='standard'?9:12;
+        const maxFont=readability==='xl'?21:readability==='standard'?14:18;
+        const maxLabels=readability==='xl'?260:readability==='standard'?160:220;
         const candidates=regs
           .filter(r=>r.size>=minArea&&r.label&&Number.isFinite(r.label[0])&&Number.isFinite(r.label[1]))
           .sort((a,b)=>b.size-a.size);
-        const desired=Math.min(maxLabels,Math.max(55,Math.round(candidates.length*.62)));
+        const desired=Math.min(maxLabels,Math.max(50,Math.round(candidates.length*.58)));
         const placed=[],used=new Set();
 
-        const placePass=(clearanceFloor,separation,minDistance)=>{
+        const placePass=(separation,minDistance,fontScale)=>{
           for(let ri=0;ri<candidates.length;ri++){
             if(labels>=maxLabels)break;
             if(used.has(ri))continue;
             const r=candidates[ri],point=r.label||[];
-            const lx=point[0],ly=point[1],clear=point[2]||0;
-            if(clear<clearanceFloor)continue;
+            let lx=point[0],ly=point[1];
+            if(!Number.isFinite(lx)||!Number.isFinite(ly)){lx=Math.round(r.cx);ly=Math.round(r.cy);}
             const x=ox+(lx+.5)*scale,y=oy+(ly+.5)*scale;
-            const areaFont=Math.sqrt(r.size)*.23;
-            const clearFont=Math.max(0,clear*scale*1.1);
-            const fs=Math.max(minFont,Math.min(maxFont,Math.max(areaFont,clearFont)));
-            const radius=Math.max(5,fs*.42);
+            const bw=Math.max(1,r.maxX-r.minX+1),bh=Math.max(1,r.maxY-r.minY+1);
+            if(Math.min(bw,bh)<2&&r.size<18)continue;
+            const fs=Math.max(minFont,Math.min(maxFont,Math.sqrt(r.size)*fontScale));
+            const radius=Math.max(4.5,fs*.38);
             let collision=false;
             for(const p of placed){
               if(Math.hypot(x-p.x,y-p.y)<Math.max(minDistance,(radius+p.r)*separation)){collision=true;break;}
@@ -110,9 +110,9 @@ const newLabels = `let labels=0;if(numbered){
             const text=codeFor(r.code);
             ctx.font='700 '+fs+'px Arial';
             ctx.lineJoin='round';ctx.miterLimit=2;
-            ctx.strokeStyle='#ffffff';ctx.lineWidth=readability==='xl'?3.2:2.3;
+            ctx.strokeStyle='#ffffff';ctx.lineWidth=readability==='xl'?3:2.2;
             ctx.strokeText(text,x,y);
-            ctx.fillStyle=readability==='standard'?'#514c47':'#332e2a';
+            ctx.fillStyle=readability==='standard'?'#514c47':'#302b27';
             ctx.fillText(text,x,y);
             placed.push({x,y,r:radius});
             used.add(ri);
@@ -120,16 +120,14 @@ const newLabels = `let labels=0;if(numbered){
           }
         };
 
-        // Passe 1 : centres les plus sûrs.
-        placePass(.25,.68,8);
-        // Passe 2 : assouplit la marge aux contours et entre codes.
-        if(labels<desired)placePass(0,.48,6);
-        // Passe 3 : complète raisonnablement les zones restantes sans superposition directe.
-        if(labels<Math.min(desired,95))placePass(0,.34,4);
+        // Plusieurs passes : on favorise d'abord l'espacement, puis on complète.
+        placePass(.62,7,.22);
+        if(labels<desired)placePass(.43,5,.20);
+        if(labels<Math.min(desired,120))placePass(.30,3.5,.18);
       }`;
 
 if (!editorial.includes(oldLabels)) {
-  throw new Error('Bloc des codes V5.3 introuvable : correctif V5.12 non appliqué.');
+  throw new Error('Bloc des codes V5.3 introuvable : correctif V5.13 non appliqué.');
 }
 editorial = editorial.replace(oldLabels, newLabels);
 fs.writeFileSync(editorialPath, editorial, 'utf8');
@@ -149,4 +147,4 @@ html = html.replace('</body>', '  <script src="editorial-mode-v53.js"></script>\
 fs.writeFileSync(indexPath, html, 'utf8');
 
 console.log(`Lion Dynasty: ${files.length} fichiers de production copiés dans dist/.`);
-console.log('Lion Dynasty: V5.12 codes plus nombreux, bien espacés et centrés actif.');
+console.log('Lion Dynasty: V5.13 codes par zone sans filtre strict de distance aux contours.');
