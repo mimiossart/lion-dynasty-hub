@@ -3,12 +3,12 @@
     const upload=document.getElementById('pixelUpload');
     const mode=document.getElementById('pixelMode');
     if(!upload||!mode){ if(n<100) setTimeout(()=>wait(n+1),100); return; }
-    if(window.__LION_EDITORIAL_V51__) return;
+    if(window.__LION_EDITORIAL_V52__) return;
     init();
   };
 
   function init(){
-    window.__LION_EDITORIAL_V51__=true;
+    window.__LION_EDITORIAL_V52__=true;
     const clone=id=>{const old=document.getElementById(id);if(!old)return null;const el=old.cloneNode(true);old.replaceWith(el);return el;};
     const upload=clone('pixelUpload');
     const grid=clone('gridSize');
@@ -30,8 +30,8 @@
     if(!upload||!grid||!colors||!mode||!canvas||!ctx||!legend||!info)return;
 
     mode.innerHTML=`
-      <option value="editorial-numbered" selected>Mode Éditorial V5.1 — contour + codes</option>
-      <option value="editorial-line">Mode Éditorial V5.1 — contour seul</option>
+      <option value="editorial-numbered" selected>Mode Éditorial V5.2 — zones organiques + codes</option>
+      <option value="editorial-line">Mode Éditorial V5.2 — zones organiques sans codes</option>
       <option value="mystery">Grille mystère numérotée</option>
       <option value="color">Aperçu couleur</option>`;
     colors.innerHTML=`
@@ -45,7 +45,7 @@
     if(merge)merge.value='medium';
     if(strokeWidth)strokeWidth.value='fine';
     if(strokeColor)strokeColor.value='light';
-    if(intro)intro.textContent='V5.1 Éditorial : zones organiques détaillées, contours très fins, petits codes et palette imprimable — sans découpage en gros blocs.';
+    if(intro)intro.textContent='V5.2 Éditorial : centaines de petites zones organiques, contours fins et codes répétés comme dans un vrai coloriage mystère.';
 
     let extras=document.getElementById('editorialExtras');
     if(!extras&&controls){
@@ -115,12 +115,11 @@
     function chaikin(points,passes=3){let pts=points.slice();if(pts.length>1&&key(...pts[0])===key(...pts[pts.length-1]))pts.pop();for(let p=0;p<passes;p++){const next=[];for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length];next.push([.75*a[0]+.25*b[0],.75*a[1]+.25*b[1]],[.25*a[0]+.75*b[0],.25*a[1]+.75*b[1]]);}pts=next;}if(pts.length)pts.push(pts[0]);return pts;}
 
     function sobelEdges(raw,w,h){
-      const gray=new Float32Array(w*h),mag=new Float32Array(w*h),gxA=new Float32Array(w*h),gyA=new Float32Array(w*h);
+      const gray=new Float32Array(w*h),mag=new Float32Array(w*h),gxA=new Float32Array(w*h),gyA=new Float32Array(w*h);let max=0;
       for(let i=0;i<w*h;i++){const o=i*4;gray[i]=.299*raw[o]+.587*raw[o+1]+.114*raw[o+2];}
-      let max=1;
       for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
         const i=y*w+x;
-        const gx=-gray[(y-1)*w+x-1]+gray[(y-1)*w+x+1]-2*gray[y*w+x-1]+2*gray[y*w+x+1]-gray[(y+1)*w+x-1]+gray[(y+1)*w+x+1];
+        const gx=-gray[(y-1)*w+x-1]-2*gray[y*w+x-1]-gray[(y+1)*w+x-1]+gray[(y-1)*w+x+1]+2*gray[y*w+x+1]+gray[(y+1)*w+x+1];
         const gy=-gray[(y-1)*w+x-1]-2*gray[(y-1)*w+x]-gray[(y-1)*w+x+1]+gray[(y+1)*w+x-1]+2*gray[(y+1)*w+x]+gray[(y+1)*w+x+1];
         const m=Math.hypot(gx,gy);mag[i]=m;gxA[i]=gx;gyA[i]=gy;if(m>max)max=m;
       }
@@ -138,21 +137,127 @@
       return alpha;
     }
 
+    function slicSegments(raw,w,h,step,compactness,iterations=5){
+      const n=w*h;
+      const gray=new Float32Array(n);
+      for(let i=0;i<n;i++){
+        const o=i*4;gray[i]=.299*raw[o]+.587*raw[o+1]+.114*raw[o+2];
+      }
+      const grad=(x,y)=>{
+        if(x<=0||y<=0||x>=w-1||y>=h-1)return 1e9;
+        const gx=gray[y*w+x+1]-gray[y*w+x-1];
+        const gy=gray[(y+1)*w+x]-gray[(y-1)*w+x];
+        return gx*gx+gy*gy;
+      };
+      const centers=[];
+      const half=Math.max(2,Math.floor(step/2));
+      for(let sy=half;sy<h;sy+=step){
+        for(let sx=half;sx<w;sx+=step){
+          let bx=sx,by=sy,bg=grad(sx,sy);
+          for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+            const x=Math.max(1,Math.min(w-2,sx+dx)),y=Math.max(1,Math.min(h-2,sy+dy)),g=grad(x,y);
+            if(g<bg){bg=g;bx=x;by=y;}
+          }
+          const o=(by*w+bx)*4;
+          centers.push({x:bx,y:by,r:raw[o],g:raw[o+1],b:raw[o+2]});
+        }
+      }
+      const labels=new Int32Array(n);labels.fill(-1);
+      const distances=new Float32Array(n);
+      const spatialFactor=(compactness*compactness*110)/(step*step);
+      for(let it=0;it<iterations;it++){
+        distances.fill(Infinity);
+        for(let ci=0;ci<centers.length;ci++){
+          const c=centers[ci];
+          const minX=Math.max(0,Math.floor(c.x-step)),maxX=Math.min(w-1,Math.ceil(c.x+step));
+          const minY=Math.max(0,Math.floor(c.y-step)),maxY=Math.min(h-1,Math.ceil(c.y+step));
+          for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++){
+            const idx=y*w+x,o=idx*4;
+            const dr=raw[o]-c.r,dg=raw[o+1]-c.g,db=raw[o+2]-c.b;
+            const dc=.30*dr*dr+.59*dg*dg+.11*db*db;
+            const dx=x-c.x,dy=y-c.y;
+            const d=dc+spatialFactor*(dx*dx+dy*dy);
+            if(d<distances[idx]){distances[idx]=d;labels[idx]=ci;}
+          }
+        }
+        const sums=centers.map(()=>[0,0,0,0,0,0]);
+        for(let i=0;i<n;i++){
+          const ci=labels[i];if(ci<0)continue;
+          const x=i%w,y=(i/w)|0,o=i*4,su=sums[ci];
+          su[0]+=x;su[1]+=y;su[2]+=raw[o];su[3]+=raw[o+1];su[4]+=raw[o+2];su[5]++;
+        }
+        for(let ci=0;ci<centers.length;ci++){
+          const su=sums[ci];if(!su[5])continue;
+          centers[ci]={x:su[0]/su[5],y:su[1]/su[5],r:su[2]/su[5],g:su[3]/su[5],b:su[4]/su[5]};
+        }
+      }
+      const minComp=Math.max(4,Math.round(step*step*.18));
+      const seen=new Uint8Array(n),dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+        const start=y*w+x;if(seen[start])continue;
+        const lab=labels[start],q=[start];seen[start]=1;let qp=0;const comp=[],neighbors=new Map();
+        while(qp<q.length){
+          const idx=q[qp++],cx=idx%w,cy=(idx/w)|0;comp.push(idx);
+          for(const[dx,dy]of dirs){
+            const nx=cx+dx,ny=cy+dy;if(nx<0||ny<0||nx>=w||ny>=h)continue;
+            const ni=ny*w+nx;
+            if(labels[ni]===lab&&!seen[ni]){seen[ni]=1;q.push(ni);}else if(labels[ni]!==lab){const nl=labels[ni];neighbors.set(nl,(neighbors.get(nl)||0)+1);}
+          }
+        }
+        if(comp.length<minComp&&neighbors.size){let best=lab,score=-1;for(const[nl,c]of neighbors){if(c>score){score=c;best=nl;}}for(const idx of comp)labels[idx]=best;}
+      }
+      return {labels,centers};
+    }
+
+    function paletteForRaw(raw,count){
+      const sample=[],step=Math.max(1,Math.floor((raw.length/4)/42000));
+      for(let i=0,p=0;i<raw.length;i+=4,p++){
+        if(p%step)continue;
+        const r=raw[i],g=raw[i+1],b=raw[i+2],gray=(r+g+b)/3;
+        sample.push([clamp(gray+(r-gray)*1.08),clamp(gray+(g-gray)*1.08),clamp(gray+(b-gray)*1.08)]);
+      }
+      return refine(sample,medianCut(sample,count),6).sort((a,b)=>lum(a)-lum(b));
+    }
+
+    function codeMapForSegments(labels,raw,palette){
+      let max=-1;for(let i=0;i<labels.length;i++)if(labels[i]>max)max=labels[i];
+      const sums=Array.from({length:max+1},()=>[0,0,0,0]);
+      for(let i=0;i<labels.length;i++){
+        const lab=labels[i],o=i*4,s=sums[lab];if(!s)continue;
+        s[0]+=raw[o];s[1]+=raw[o+1];s[2]+=raw[o+2];s[3]++;
+      }
+      const map=new Int16Array(max+1);
+      for(let lab=0;lab<=max;lab++){
+        const s=sums[lab];if(!s||!s[3]){map[lab]=0;continue;}
+        const p=[s[0]/s[3],s[1]/s[3],s[2]/s[3]];
+        let bi=0,bd=Infinity;for(let j=0;j<palette.length;j++){const d=dist(p,palette[j]);if(d<bd){bd=d;bi=j;}}
+        map[lab]=bi;
+      }
+      return map;
+    }
+
     function makeEditorialModel(img){
-      const longSide=complexity?.value==='high'?700:complexity?.value==='low'?420:560;
-      const aspect=img.width/img.height;let w,h;if(aspect>=1){w=longSide;h=Math.max(180,Math.round(longSide/aspect));}else{h=longSide;w=Math.max(180,Math.round(longSide*aspect));}
-      const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d',{willReadFrequently:true});x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';const cr=cropRect(img,w,h);x.drawImage(img,cr.sx,cr.sy,cr.sw,cr.sh,0,0,w,h);
-      let raw=x.getImageData(0,0,w,h).data;raw=blurRGB(raw,w,h,complexity?.value==='low'?2:1);
+      const longSide=complexity?.value==='high'?520:complexity?.value==='low'?360:440;
+      const aspect=img.width/img.height;let w,h;
+      if(aspect>=1){w=longSide;h=Math.max(180,Math.round(longSide/aspect));}
+      else{h=longSide;w=Math.max(180,Math.round(longSide*aspect));}
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      const x=c.getContext('2d',{willReadFrequently:true});x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';
+      const cr=cropRect(img,w,h);x.drawImage(img,cr.sx,cr.sy,cr.sw,cr.sh,0,0,w,h);
+      let raw=x.getImageData(0,0,w,h).data;
+      raw=blurRGB(raw,w,h,complexity?.value==='low'?2:1);
       const edges=sobelEdges(raw,w,h);
-      const px=[],sample=[],sampleStep=complexity?.value==='high'?7:complexity?.value==='low'?4:5;
-      for(let i=0;i<raw.length;i+=4){const r=raw[i],g=raw[i+1],b=raw[i+2],gray=(r+g+b)/3;const p=[clamp(gray+(r-gray)*1.10),clamp(gray+(g-gray)*1.10),clamp(gray+(b-gray)*1.10)];px.push(p);if((i/4)%sampleStep===0)sample.push(p);}
-      const count=+colors.value;const palette=refine(sample,medianCut(sample,count),6).sort((a,b)=>lum(a)-lum(b));
-      let assignments=new Uint16Array(px.length);for(let n=0;n<px.length;n++){let bi=0,bd=Infinity;for(let i=0;i<palette.length;i++){const d=dist(px[n],palette[i]);if(d<bd){bd=d;bi=i;}}assignments[n]=bi;}
-      assignments=modeSmooth(assignments,w,h,complexity?.value==='low'?2:1);
-      const area=w*h;let factor=complexity?.value==='high'?.000035:complexity?.value==='low'?.00012:.000065;if(merge?.value==='strong')factor*=1.7;
-      assignments=mergeSmall(assignments,w,h,Math.max(8,Math.round(area*factor)),2);
-      const rs=regions(assignments,w,h);for(const r of rs)r.label=labelPoint(r,w);
-      return{w,h,palette,assignments,regions:rs,edges};
+      const palette=paletteForRaw(raw,+colors.value);
+      let step=complexity?.value==='high'?10:complexity?.value==='low'?20:14;
+      if(merge?.value==='strong')step=Math.round(step*1.20);
+      const compactness=complexity?.value==='high'?3.5:complexity?.value==='low'?6.5:4.8;
+      const slic=slicSegments(raw,w,h,step,compactness,5);
+      let labels=slic.labels;
+      labels=modeSmooth(labels,w,h,1);
+      const codeBySegment=codeMapForSegments(labels,raw,palette);
+      const rs=regions(labels,w,h);
+      for(const r of rs){r.code=codeBySegment[r.color]??0;r.label=labelPoint(r,w);}
+      return{w,h,palette,assignments:labels,regions:rs,edges,step};
     }
 
     function codeFor(i){if(codeMode?.value==='numbers')return String(i+1);if(i<9)return String(i+1);if(i===9)return'0';return String.fromCharCode(65+((i-10)%26));}
@@ -169,10 +274,10 @@
       drawEdgeLayer(edges,w,h,ox,oy,scale);
       const strokeMap={light:'#aaa7a3',medium:'#898681',dark:'#5c5955'};ctx.strokeStyle=strokeMap[strokeColor?.value||'light'];ctx.lineWidth=(strokeWidth?.value||'fine')==='fine'?.72:1.15;ctx.lineCap='round';ctx.lineJoin='round';
       const sorted=rs.slice().sort((a,b)=>b.size-a.size);let contourCount=0;
-      for(const reg of sorted){if(reg.size<6)continue;for(const rawLoop of loopsFor(reg,w,h)){const tol=complexity?.value==='high'?.32:complexity?.value==='low'?.85:.48;const curve=chaikin(simplify(rawLoop,tol),complexity?.value==='high'?3:2);if(curve.length<6)continue;ctx.beginPath();ctx.moveTo(ox+curve[0][0]*scale,oy+curve[0][1]*scale);for(let i=1;i<curve.length;i++)ctx.lineTo(ox+curve[i][0]*scale,oy+curve[i][1]*scale);ctx.closePath();ctx.stroke();contourCount++;}}
-      let labelCount=0;if(numbered){ctx.textAlign='center';ctx.textBaseline='middle';let minLabel=Math.max(10,Math.round(w*h*(complexity?.value==='high'?.000035:.000055)));if(merge?.value==='strong')minLabel*=1.25;for(const reg of sorted){if(reg.size<minLabel)continue;const[lx,ly]=reg.label,text=codeFor(reg.color),fs=Math.max(6,Math.min(10.5,Math.sqrt(reg.size)*.20));ctx.font=`500 ${fs}px Arial`;ctx.fillStyle=strokeMap[strokeColor?.value||'light'];ctx.fillText(text,ox+(lx+.5)*scale,oy+(ly+.5)*scale);labelCount++;}}
+      for(const reg of sorted){if(reg.size<4)continue;for(const rawLoop of loopsFor(reg,w,h)){const tol=complexity?.value==='high'?.32:complexity?.value==='low'?.85:.48;const curve=chaikin(simplify(rawLoop,tol),complexity?.value==='high'?3:2);if(curve.length<6)continue;ctx.beginPath();ctx.moveTo(ox+curve[0][0]*scale,oy+curve[0][1]*scale);for(let i=1;i<curve.length;i++)ctx.lineTo(ox+curve[i][0]*scale,oy+curve[i][1]*scale);ctx.closePath();ctx.stroke();contourCount++;}}
+      let labelCount=0;if(numbered){ctx.textAlign='center';ctx.textBaseline='middle';let minLabel=Math.max(8,Math.round((model.step||12)*(model.step||12)*.34));if(merge?.value==='strong')minLabel*=1.10;for(const reg of sorted){if(reg.size<minLabel)continue;const[lx,ly]=reg.label,text=codeFor(reg.code),fs=Math.max(5.2,Math.min(8.4,Math.sqrt(reg.size)*.17));ctx.font=`500 ${fs}px Arial`;ctx.fillStyle=strokeMap[strokeColor?.value||'light'];ctx.fillText(text,ox+(lx+.5)*scale,oy+(ly+.5)*scale);labelCount++;}}
       const gap=8,itemW=Math.floor((pageW-margin*2-(palette.length-1)*gap)/palette.length),y0=pageH-112;ctx.textAlign='center';ctx.textBaseline='middle';for(let i=0;i<palette.length;i++){const x0=margin+i*(itemW+gap);ctx.fillStyle=hex(palette[i]);ctx.fillRect(x0,y0,itemW,48);ctx.strokeStyle='#c7c3be';ctx.lineWidth=.8;ctx.strokeRect(x0,y0,itemW,48);ctx.fillStyle=lum(palette[i])<120?'#fff':'#2f2b27';ctx.font='700 17px Arial';ctx.fillText(codeFor(i),x0+itemW/2,y0+24);}
-      ctx.fillStyle='#8b8782';ctx.font='12px Arial';ctx.textAlign='left';ctx.fillText('Lion Dynasty — Mode Éditorial V5.1',margin,pageH-30);info.textContent=`Mode Éditorial V5.1 • ${palette.length} couleurs • ${rs.length} zones • ${contourCount} contours${numbered?` • ${labelCount} codes`:''} • ${w}×${h}`;legend.innerHTML=palette.map((c,i)=>`<div class="swatch"><div class="swatch-color" style="background:${hex(c)}"></div><small>${codeFor(i)}<br>${hex(c)}</small></div>`).join('');
+      ctx.fillStyle='#8b8782';ctx.font='12px Arial';ctx.textAlign='left';ctx.fillText('Lion Dynasty — Mode Éditorial V5.2',margin,pageH-30);info.textContent=`Mode Éditorial V5.2 • ${palette.length} couleurs • ${rs.length} zones • ${contourCount} contours${numbered?` • ${labelCount} codes`:''} • ${w}×${h}`;legend.innerHTML=palette.map((c,i)=>`<div class="swatch"><div class="swatch-color" style="background:${hex(c)}"></div><small>${codeFor(i)}<br>${hex(c)}</small></div>`).join('');
     }
 
     function drawLegacy(){
@@ -180,11 +285,11 @@
     }
 
     function toggle(){const editorial=mode.value.startsWith('editorial');if(controls)controls.hidden=!editorial;const gl=grid.closest('label');if(gl)gl.style.display=editorial?'none':'';}
-    function regenerate(){if(!image)return;const token=++busyToken,editorial=mode.value.startsWith('editorial');info.textContent=editorial?'Création des zones organiques haute définition…':'Analyse de l’image…';setTimeout(()=>{if(token!==busyToken)return;try{if(editorial){model=makeEditorialModel(image);drawEditorial(mode.value==='editorial-numbered');}else drawLegacy();}catch(err){console.error(err);info.textContent='La génération a échoué. Essaie une complexité moyenne.';}},35);}
+    function regenerate(){if(!image)return;const token=++busyToken,editorial=mode.value.startsWith('editorial');info.textContent=editorial?'Création de centaines de zones organiques…':'Analyse de l’image…';setTimeout(()=>{if(token!==busyToken)return;try{if(editorial){model=makeEditorialModel(image);drawEditorial(mode.value==='editorial-numbered');}else drawLegacy();}catch(err){console.error(err);info.textContent='La génération a échoué. Essaie une complexité moyenne.';}},35);}
 
     upload.addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=ev=>{const im=new Image();im.onload=()=>{image=im;regenerate();};im.src=ev.target.result;};r.readAsDataURL(file);});
     mode.addEventListener('change',()=>{toggle();regenerate();});colors.addEventListener('change',regenerate);grid.addEventListener('change',regenerate);[complexity,merge,strokeWidth,strokeColor,codeMode,guideGrid].forEach(el=>el?.addEventListener('change',regenerate));
-    download?.addEventListener('click',()=>{if(!image)return;const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download=mode.value.startsWith('editorial')?'lion-dynasty-editorial-v5.png':'lion-dynasty-coloriage.png';a.click();});
+    download?.addEventListener('click',()=>{if(!image)return;const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download=mode.value.startsWith('editorial')?'lion-dynasty-editorial-v52.png':'lion-dynasty-coloriage.png';a.click();});
     printBtn?.addEventListener('click',()=>{if(!image)return;const data=canvas.toDataURL('image/png'),w=window.open('','_blank');w.document.write(`<title>Lion Dynasty — Coloriage Mystère</title><style>@page{size:A4 portrait;margin:6mm}body{margin:0;text-align:center}img{width:100%;max-height:98vh;object-fit:contain}</style><img src="${data}"><script>onload=()=>setTimeout(()=>print(),180)<\/script>`);w.document.close();});
     toggle();info.textContent='Importe une photo pour créer un coloriage éditorial détaillé.';
   }
