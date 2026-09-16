@@ -11,7 +11,8 @@ const files = [
   'app.part3.txt',
   'app.part4.txt',
   'app.part5.txt',
-  'editorial-mode-v54.js'
+  'editorial-mode-v54.js',
+  'editorial-labels-v55.js'
 ];
 
 const out = path.join(process.cwd(), 'dist');
@@ -30,9 +31,10 @@ html = html
   .replace(/\s*<script src="example-mode-v2\.js"><\/script>/g, '')
   .replace(/\s*<script src="editorial-mode-v5\.js"><\/script>/g, '')
   .replace(/\s*<script src="editorial-mode-v53\.js"><\/script>/g, '')
-  .replace(/\s*<script src="editorial-mode-v54\.js"><\/script>/g, '');
-html = html.replace('</body>', '  <script src="editorial-mode-v54.js"></script>\n</body>');
+  .replace(/\s*<script src="editorial-mode-v54\.js"><\/script>/g, '')
+  .replace(/\s*<script src="editorial-labels-v55\.js"><\/script>/g, '');
+html = html.replace('</body>', '  <script src="editorial-mode-v54.js"></script>\n  <script src="editorial-labels-v55.js"></script>\n</body>');
 fs.writeFileSync(indexPath, html, 'utf8');
 
 console.log(`Lion Dynasty: ${files.length} fichiers de production copiés dans dist/.`);
-console.log('Lion Dynasty: moteur unique V5.4 contours + super-zones actif.');
+console.log('Lion Dynasty: V5.4 + correctif V5.5 codes lisibles actif.');
