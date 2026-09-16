@@ -35,3 +35,13 @@
   setTimeout(() => repair(), 3200);
   setTimeout(() => repair(), 5000);
 })();
+
+// V5.16 : moteur séparé Paint by Numbers détaillé (SVG).
+setTimeout(() => {
+  if (window.__LION_SVG_LOADER_V516__) return;
+  window.__LION_SVG_LOADER_V516__ = true;
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/gh/mimiossart/lion-dynasty-hub@ac37cbe664c6826bbd16a5c7b1b3e56db341e375/paint-by-numbers-svg-v516.js';
+  script.crossOrigin = 'anonymous';
+  document.body.appendChild(script);
+}, 5800);
