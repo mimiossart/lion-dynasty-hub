@@ -1,5 +1,6 @@
 [build]
-  publish = "."
+  command = "python build.py"
+  publish = "dist"
 
 [[headers]]
   for = "/*"
@@ -13,8 +14,3 @@
   for = "/index.html"
   [headers.values]
     Cache-Control = "no-store, max-age=0"
-
-[[headers]]
-  for = "/payload*.js"
-  [headers.values]
-    Cache-Control = "public, max-age=3600"
