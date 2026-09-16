@@ -25,12 +25,13 @@ for (const file of files) {
   fs.copyFileSync(file, path.join(out, file));
 }
 
-// V5.11 : placement équilibré des codes sur le moteur V5.3 stable.
+// V5.12 : placement équilibré avec davantage de codes lisibles.
 const editorialPath = path.join(out, 'editorial-mode-v53.js');
 let editorial = fs.readFileSync(editorialPath, 'utf8');
 
 editorial = editorial
   .replace("if(complexity)complexity.value='high';", "if(complexity)complexity.value='medium';")
+  .replace("if(merge)merge.value='strong';", "if(merge)merge.value='medium';")
   .replace(
     '<label>Codes<select class="field" id="editorialCodes"><option value="hybrid" selected>1–9, 0, A…</option><option value="numbers">Chiffres uniquement</option></select></label>',
     '<label>Codes<select class="field" id="editorialCodes"><option value="hybrid">1–9, 0, A…</option><option value="numbers" selected>Chiffres uniquement</option></select></label>'
@@ -41,12 +42,12 @@ const oldLabelPoint = "function labelPoint(r,w){const set=new Set(r.cells);let b
 const newLabelPoint = `function labelPoint(r,w){
       const set=new Set(r.cells);
       let bx=Math.round(r.cx),by=Math.round(r.cy),bestScore=-Infinity,bestClear=0;
-      const sample=Math.max(1,Math.floor(Math.sqrt(r.size)/12));
+      const sample=Math.max(1,Math.floor(Math.sqrt(r.size)/14));
       for(let y=r.minY;y<=r.maxY;y+=sample){
         for(let x=r.minX;x<=r.maxX;x+=sample){
           if(!set.has(y*w+x))continue;
           let clearance=0;
-          for(let rr=1;rr<=18;rr++){
+          for(let rr=1;rr<=14;rr++){
             let inside=true;
             for(let dx=-rr;dx<=rr;dx++){
               const y1=y-rr,y2=y+rr,x1=x+dx;
@@ -61,20 +62,16 @@ const newLabelPoint = `function labelPoint(r,w){
             if(!inside)break;
             clearance=rr;
           }
-          const centerPenalty=Math.hypot(x-r.cx,y-r.cy)*0.018;
+          const centerPenalty=Math.hypot(x-r.cx,y-r.cy)*0.012;
           const score=clearance-centerPenalty;
-          if(score>bestScore){
-            bestScore=score;
-            bestClear=clearance;
-            bx=x;by=y;
-          }
+          if(score>bestScore){bestScore=score;bestClear=clearance;bx=x;by=y;}
         }
       }
       return[bx,by,bestClear];
     }`;
 
 if (!editorial.includes(oldLabelPoint)) {
-  throw new Error('Fonction labelPoint V5.3 introuvable : correctif V5.11 non appliqué.');
+  throw new Error('Fonction labelPoint V5.3 introuvable : correctif V5.12 non appliqué.');
 }
 editorial = editorial.replace(oldLabelPoint, newLabelPoint);
 
@@ -83,18 +80,17 @@ const oldLabels = "let labels=0;if(numbered){ctx.textAlign='center';ctx.textBase
 const newLabels = `let labels=0;if(numbered){
         ctx.textAlign='center';ctx.textBaseline='middle';
         const readability=window.__LION_LABEL_READABILITY__||'readable';
-        const minArea=readability==='xl'?10:readability==='standard'?22:14;
-        const minClear=readability==='xl'?.35:readability==='standard'?.9:.55;
-        const minFont=readability==='xl'?16:readability==='standard'?9.5:12;
-        const maxFont=readability==='xl'?22:readability==='standard'?14:18;
-        const maxLabels=readability==='xl'?210:readability==='standard'?125:170;
+        const minArea=readability==='xl'?7:readability==='standard'?14:9;
+        const minFont=readability==='xl'?18:readability==='standard'?11:14;
+        const maxFont=readability==='xl'?24:readability==='standard'?16:20;
+        const maxLabels=readability==='xl'?280:readability==='standard'?180:230;
         const candidates=regs
           .filter(r=>r.size>=minArea&&r.label&&Number.isFinite(r.label[0])&&Number.isFinite(r.label[1]))
           .sort((a,b)=>b.size-a.size);
+        const desired=Math.min(maxLabels,Math.max(55,Math.round(candidates.length*.62)));
         const placed=[],used=new Set();
-        const desired=Math.min(maxLabels,Math.max(28,Math.round(candidates.length*.48)));
 
-        const placePass=(clearanceFloor,separation)=>{
+        const placePass=(clearanceFloor,separation,minDistance)=>{
           for(let ri=0;ri<candidates.length;ri++){
             if(labels>=maxLabels)break;
             if(used.has(ri))continue;
@@ -102,21 +98,21 @@ const newLabels = `let labels=0;if(numbered){
             const lx=point[0],ly=point[1],clear=point[2]||0;
             if(clear<clearanceFloor)continue;
             const x=ox+(lx+.5)*scale,y=oy+(ly+.5)*scale;
-            const available=Math.max(1,clear*scale*1.35);
-            const fs=Math.max(minFont,Math.min(maxFont,Math.max(available,Math.sqrt(r.size)*.18)));
-            const radius=Math.max(7,fs*.55);
+            const areaFont=Math.sqrt(r.size)*.23;
+            const clearFont=Math.max(0,clear*scale*1.1);
+            const fs=Math.max(minFont,Math.min(maxFont,Math.max(areaFont,clearFont)));
+            const radius=Math.max(5,fs*.42);
             let collision=false;
             for(const p of placed){
-              if(Math.hypot(x-p.x,y-p.y)<Math.max(9,(radius+p.r)*separation)){collision=true;break;}
+              if(Math.hypot(x-p.x,y-p.y)<Math.max(minDistance,(radius+p.r)*separation)){collision=true;break;}
             }
             if(collision)continue;
-
             const text=codeFor(r.code);
             ctx.font='700 '+fs+'px Arial';
             ctx.lineJoin='round';ctx.miterLimit=2;
-            ctx.strokeStyle='#ffffff';ctx.lineWidth=readability==='xl'?3.5:2.6;
+            ctx.strokeStyle='#ffffff';ctx.lineWidth=readability==='xl'?3.2:2.3;
             ctx.strokeText(text,x,y);
-            ctx.fillStyle=readability==='standard'?'#514c47':'#302b27';
+            ctx.fillStyle=readability==='standard'?'#514c47':'#332e2a';
             ctx.fillText(text,x,y);
             placed.push({x,y,r:radius});
             used.add(ri);
@@ -124,12 +120,16 @@ const newLabels = `let labels=0;if(numbered){
           }
         };
 
-        placePass(minClear,.82);
-        if(labels<desired)placePass(minClear*.45,.56);
+        // Passe 1 : centres les plus sûrs.
+        placePass(.25,.68,8);
+        // Passe 2 : assouplit la marge aux contours et entre codes.
+        if(labels<desired)placePass(0,.48,6);
+        // Passe 3 : complète raisonnablement les zones restantes sans superposition directe.
+        if(labels<Math.min(desired,95))placePass(0,.34,4);
       }`;
 
 if (!editorial.includes(oldLabels)) {
-  throw new Error('Bloc des codes V5.3 introuvable : correctif V5.11 non appliqué.');
+  throw new Error('Bloc des codes V5.3 introuvable : correctif V5.12 non appliqué.');
 }
 editorial = editorial.replace(oldLabels, newLabels);
 fs.writeFileSync(editorialPath, editorial, 'utf8');
@@ -149,4 +149,4 @@ html = html.replace('</body>', '  <script src="editorial-mode-v53.js"></script>\
 fs.writeFileSync(indexPath, html, 'utf8');
 
 console.log(`Lion Dynasty: ${files.length} fichiers de production copiés dans dist/.`);
-console.log('Lion Dynasty: V5.11 codes équilibrés, plus nombreux et anti-chevauchement actif.');
+console.log('Lion Dynasty: V5.12 codes plus nombreux, bien espacés et centrés actif.');
