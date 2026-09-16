@@ -25,7 +25,7 @@ for (const file of files) {
   fs.copyFileSync(file, path.join(out, file));
 }
 
-// V5.8 : conserver le moteur V5.3 stable, mais rendre les codes réellement utilisables.
+// V5.9 : conserver le moteur V5.3 stable, avec codes réellement lisibles sur A4.
 const editorialPath = path.join(out, 'editorial-mode-v53.js');
 let editorial = fs.readFileSync(editorialPath, 'utf8');
 
@@ -41,26 +41,26 @@ const oldLabels = "let labels=0;if(numbered){ctx.textAlign='center';ctx.textBase
 const newLabels = `let labels=0;if(numbered){
         ctx.textAlign='center';ctx.textBaseline='middle';
         const readability=window.__LION_LABEL_READABILITY__||'readable';
-        const minLabel=readability==='xl'?6:readability==='standard'?12:8;
-        const minFont=readability==='xl'?15:readability==='standard'?10:12;
-        const maxFont=readability==='xl'?22:readability==='standard'?15:18;
+        const minLabel=readability==='xl'?3:readability==='standard'?8:4;
+        const minFont=readability==='xl'?34:readability==='standard'?18:26;
+        const maxFont=readability==='xl'?46:readability==='standard'?28:38;
         for(const r of regs){
           if(r.size<minLabel)continue;
           const text=codeFor(r.code),[lx,ly]=r.label;
-          const fs=Math.max(minFont,Math.min(maxFont,Math.sqrt(r.size)*.30));
+          const fs=Math.max(minFont,Math.min(maxFont,Math.sqrt(r.size)*.52));
           const x=ox+(lx+.5)*scale,y=oy+(ly+.5)*scale;
           ctx.font=\`700 \${fs}px Arial\`;
           ctx.lineJoin='round';ctx.miterLimit=2;
-          ctx.strokeStyle='#ffffff';ctx.lineWidth=readability==='xl'?4:3;
+          ctx.strokeStyle='#ffffff';ctx.lineWidth=readability==='xl'?6:4;
           ctx.strokeText(text,x,y);
-          ctx.fillStyle=readability==='standard'?'#5c5752':'#403b36';
+          ctx.fillStyle=readability==='standard'?'#4f4a45':'#2f2a26';
           ctx.fillText(text,x,y);
           labels++;
         }
       }`;
 
 if (!editorial.includes(oldLabels)) {
-  throw new Error('Bloc des codes V5.3 introuvable : correctif V5.8 non appliqué.');
+  throw new Error('Bloc des codes V5.3 introuvable : correctif V5.9 non appliqué.');
 }
 editorial = editorial.replace(oldLabels, newLabels);
 fs.writeFileSync(editorialPath, editorial, 'utf8');
@@ -80,4 +80,4 @@ html = html.replace('</body>', '  <script src="editorial-mode-v53.js"></script>\
 fs.writeFileSync(indexPath, html, 'utf8');
 
 console.log(`Lion Dynasty: ${files.length} fichiers de production copiés dans dist/.`);
-console.log('Lion Dynasty: V5.3 stable + V5.8 codes grands, foncés et lisibles actif.');
+console.log('Lion Dynasty: V5.3 stable + V5.9 codes A4 très lisibles actif.');
