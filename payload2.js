@@ -1,1 +1,301 @@
-window.__LD_PAYLOAD=(window.__LD_PAYLOAD||"")+"Au+FSx6rwdNiFiZhbMxuP05YdAGDAjpIDMFTtOEC345g7pex4UMhe4GHSmBJw1AWykgU9ItAVWWBaqwWZLwSEWoW+NRjoEZAVuRFJPCySdAYTYF3SLhp7KggEaCCh3zR5/nHaQTDjow5wiAk6uu+SNA6deN+uEqSZP2b9fRliOho8+QezriYcCkginTVO3kNNCCDhqAGUdQrnIwkNxlQVqWrU84cGOiNHs3gPJwAf7eMBOVuAqsdtAUwEbwAKAs+Dwkg2QIekC7+dIA4OFXAI9cEaKli2wDSQ83egA4AbSTV1EBKoE4Lua+gcgn29d1f/2nKyjgHO1MIUTLzXW0Z18L79u9z8E7V1XN3gP/xt3/55zmIL5+fGTEy0Ki6jzkyItIpcDvO5DjDA11NygxhP2Tihh45cacqQInyQEzQrJgTxSYpTM1JOWPsdAVTlNF8cqhAeK9K2AZRZBG1C6LoaejFmfyy8BQl6s0OiBRBeMwAPctgQcQuPMA3vkiFEF+tqRBCEhUcFosRu8LFsQQhWc2wcjOkYIcbgBzDWfDi5yRJqhgCIIMXo/nbMG0pq/sppq2Xl2XKvIHw+QKwRQdEZ2wat9zvfv/t//kLYL6scvqe55iBkC84CaqEMeJQcAf7gthIgCpLKkaEtEJLCcRf6dSUoiBnkBaxoDxnytMrkCNAQtxKm99+jNC+iW2Dm2Ke4xkg9otKlBgx2SuMpDFJTQu4uEt2HphMaFOijAVgwDYRC/BybifYCPOF6Xb7UR9hgfxKpRmdWuAUgx5nYTblpdi//+ufGbyHUaX8KhfTqrNARyRt2Mty5HrTCPeM2ZEDHSH0zUIf2NbYfMkckIL4P7Qg+fxa+FNgiNAHKPru9/+kN8YPoFa39igMP5i5SQkXNJVgMC8BFSaXiEhX1Biot7xAaS0oDGpU13jsxQG7qS/6OdqFsDiwbzjjGyA/DECnAUP+ZXgDf8rKIp/A4d4JA2d4gLwWAxHDjQww3nzAA1A6PtX3VdZchIulj/NPVW0PVsd2FUGpBzXmixw32H7MCrPCUG5twKekrp10slUbF3SjGsoWYZYayOfi3cnpzI4uuOPFZTkNE2izTi4Itq2C/RGlQmqB/xRSoU9S4QtapYpA+AL6Jh0AFfz/VYiWNKDPQ7tIurwsErmoLIG0ppUiFUdgDoF3+4coRyibpbGCk1O+6/QjIVpxYvwUqObG5Bnfg4416RsbihelAt8pX005KLfaYWVc3v7B1zyJ8CT2ukH8Lmc2TtHWao/0Fm8nCiQSN8mCocHZrcW73u1tz/9lE/+fC4AtNdGUaonlGOTxBi6shJbsL65/pBUifHc/xeoY0Or4tRfZvvHcnijLg3sOjc+Mz28/BqBOkZ1avU6+XJLnOxI6J0MzlyulAQXgxzEjVZfrcKCPGoBdH5W1mzhB/mQES1QNQ3Soba+QpjtMOXcHhvz7qX8g5xrgxn3/RB0Zdk2OAUfZL+ihpzOwmoQPH+YdFVDGnUT2fOJBTRhbCIAc7tfg7ILb+pnrcJG6pnSFdAteUL9ayYV+Rl8LtbIF8tVsOVum60K+PY3sm9C3C++f2hMWtU7tOAGqK1955epFfVfnYbixp6lmBSsZCB4XtA+06IYRWlDlPSkqV9Rz0K3oL1Qu5wmldd8vgwvUBv4L/UUf0DQMXLZ1/XiJwTPo414SIwbyAhbCvDvisbDUKh1vwqFn4AFqoSOxgCFxv+BUmLdcBPWjC86WlFo0YQoWoARG+gF/eMnipZ9XD7bzEirdxdDKiq6ehgtiLbi8XnkfXoUfNnc0DU4wSdID3UxxtAHf7jOmjPsncD+JK6Ox0KumsJYTKuPefpwDx0/E/uL7Zfz1Eix0WMY+/PECYFUX4htuOdqJ7YcXwBbC6RSMWua3i4xyV3AmhZ1tza5eYDyg8TBKjFPOVNHkLGFUz+aY8kqxmIVrmW/rsxYo3SXs175kTsqw2DWURysddXQcK4YmlvCsKvWEQhdfL9ASkHNJyrWBp10WydgkgLv3ze/DAykmBf3UU0rcFQbFtVht0oGoOPO+YSWcp7CEe3vmSW+PvGIxicnYmy/8GhZQgNDvgaZAXWHuSb+ngLr9+PXS871JLTsrwNs7NE/2DhUwQKGJDfNYyxSrGPQuR2Q5eoFv0W74HXBL3mthO24xFhgKaAe8lTvgYF9B6f73AQA4PNyi3p3QVsb5KvFEi+OL0C0SYd7Gx8RntHdcrSpVihMdFE9ed/JwwaLbf17K4Vdo0+WSSPVdZVHOwPX5Uza0U3o2DZ5pz9zf65gGD7uCWe93UE7wKqUCo1LWIOjnDISaa26qmPH+rOqzYBqaJbyR62zkOnVIL6uFLDbXDJEFpjiDtcJZehpAdBAzz8s56B0ULPMk3mXPzQ2vAuS8pU28+PLzCtlZI6s27cfdzf7nu88/hXWzT0xS3+dODRzQCmNQKhh5eoMaj7uNO9IYeetJIx93SEBpehHGyUXEzv74uUXG7yL0PeF9efn8DN8Zk6XzAaSvK2VoLFzUuK8vgpTuujGyydAxssh0U2ySddNh9zHARA0hIA0C/Ry4h7Yg7oIC//XL56jTiHgD+C8WwU/S47S7yMKIaAQl5LJ1/3pK/x7hltJnck+PNkx4D59sjpNYyr0t2qvCcdx+dD0y72CSsgH94A73lQ6fqkFoKTrT0A8/F17G+1YeEGJx3xJIdVCdPNrgcMM4Rt2XRwEEMmIAIFUNYotFig98jxN/8vMHGe/Ep8qwDvWwQraIxdaNFkahxl1xL8Nefo9HbDLLjcSHy2Rm/Nv/VtYVPp0lYYS+K/j5Ejjvc3YJWvAZI+q4Uf3SymYu72UhWIhi4UVoE7T1BX+0I89u8UAh3NNdlsW0ZAcMSjlXGmSf414VjOmU76DOdf9vP+3YKzw9bWLoitikFZp+njno4iCN3jeBxkBO0bM2Ul0U3P5VXhLopKOMLw3MNytbh68Gj4kXzQNO0A6GReAFRYMujfwq7JkVwBbggfjIC86AxyeWQNTHxA/ECjQ/hQdT0xlynqTUEc5bfYo6XKwHlVUoHxRTn1yFeQOH645fhnPDRiMRVnOlDSUib7+05+wZFjHBTr/2WXCBShXqVJrP9/ntR5svOdSOylRU/u5FzJZuWNnoEkRiUNoiWEN6iz6z35JaGZe2WBSlvMgjLzyWiTvK/FheWGy7u58f7lNYVShBs4AZqRyDYfQ3f8AeyUaKncsvI/75SQtYol+JGYZfRdc48dEbk7KloDoIumr2MmJg30VgohQb589fhLQBtkAlpNqMhhdXYeRqzcqXgCEvkBg6zPcD2CMmH25lpWu6tIXSiuvlbDmZe2k/Yv6U41KF5VzlkjHmCgYo2uQCbBrUMOzI0EUCqB8ByHIsI+KolcAUKi81KpDwGDzdzslAbLg6vLFcQAj95j9NRnyJEYto9Snbdqoax2MORPicWAXfX0joo72bnEh5qgCyma0KVoT2VzXtgxLwDFVmjfjLvEjvF+zC4j8Xgfx1xSaLWppX7Ux+VChr94V8ITj9sTe/MGwfWhQGdMECFUMCwR2x2iGRaC9yOGRwsrM6p8M9YZAT/5Awewl078xs9Dua9SOqlkGio89xn67GRQE9xX0/3tGT+p27zZt1G/bnUodDmRgRtILUXYfXFxmlKGjtV6L1Bd8ONbeVDl/ImKLaXkApBivRL/bkMC/BaCvG+FUYhP7SX5qVguIxy1SbGrmJrStFy1CR78EfL5lPxipw4pgbGOlGAG0T18rQbRwdnB+Ui42KoKnvyax5oMJ/GrOWQRspe4aeeFPJnxcypOP7MmdtdN+XOXMg2+m827KRrRRZ0TIqsgUdtppBb6uxCuivheJa0FlrREDpQt+gn4rmoFRBQ/1B60VfHE+kfvODFgid75QhBfgzI7/0ZF2j0TTGJ8ZqB1V/TDnjOYk52tlxcOPLcKYXxtioOX72u98Zq/VIlhaeEOC1Y2gDKreVg2nGZ5/lXuon0fj3T3K12l7g+EuXxQ1+Ts1slpTTARWrpONRzgbBuNzQWWLgTvuCJU98iuF5dPPMbWhHiKCy8tjmbAUqZ4MF6D76+CbwNlj6/ogehQKOdFn2nnMMpn2i86Dw5s05fxbx5WcJSBU86Lfmr4G+/MSbs9MZdsnXQAhjH4tL01vAZgEG4KFr5ana7o43NRrKxH32mZxuidwmnTCk0eW+4CUX0LVTn9+Lok+cVTPVFoE0qLdDYwWdi2Kg9jN+yGJoIM+2yKB5yaZg0s1ehR9Y+t4FA8eRhZ8FdOYRvxhrALqG+Vqn5JuGjxNa4fPKc4dm0jUtgzLUDU1NpTF5mFQ8fCP0A9PiPw7kD9AY5K9D83xtSZAXTgayoAflwfYljKMU2L781eupYO0oA6srTwpM9LpR9SCZoQVMv+nVK+8CHs/XO+fZCpBxTBIhE1DzytEwTMeOu+RLPxmap1IRtWkPSY9sMHm/NwJEHKYQQR7d/kuSKbZMg1KFymGKvxTQI9s3eLTIHQAg3lMIZ87tH3hsD8bWqlBKUT8UiE/rvwgj2jXnUSrbAODTlAHwl3jRwu3HOYtsYGAmn7jpMuC7KcTEG1Akhtp8WfJJTeqYGWf9sCwMI2mjgBLhnFBHgOKfSGg8h2XYtl3kgTNQbKiW4zM7wjsgwmXS4DkD3iL/iThM5QWABF4pi3LJogKO2Dy8ZBK2BcTe6fD1mo4RVFh7wX716ovnDRldyEcaAROOAuMsQZ8y/9YEgKTRNnbffHZ8Yv78fPcC2A622uAMxvzMHJqf2fPFCFbDMf72E/x5gj8v8OfPzZ/Dz6+XIb3/Ob6/1+kfjUzkJW+c82auf+KusLjBrwZ7/ljvHr5tQxfnjWY7Xvhe0tj9bfxgFx7AhmeNjtVrtuf2onE9Prl+0zn/3e9geO33oRc08EcSvl4ALzwFhgnIA9mK8PX28SgCKYINz1VJgORAFQ1AUZwq5ucnGaGZ8htM3cME+g76BsyRokQDYqYwZMZLpo3gCfA2BUK2ZUIOFDuijt5t0mR/lH5LGtq662QAUEEUdZ+kbQE3wLMUKCDCqGEqyYXMZnPjKPn4yoE99P2G+SbT4M9hakFpe2I7swYqfmPUwDAFJszBEzzGhwPDYK0GWACe8wFYAl87CtawOEKEkfI0Pc3mDgyqpgN8QErT9Mwb52Otbp5xnRCXECINSBqj9oFljMe8blPtG4cmJmtN/cpmXujfp6mK0eDTzydj0hTNcN5mpsVoy9TGLCqZM5B2ztI9Mz6nxgYtDsbPb6V7FiThrz121Vil19OZ/H46cy0giTVMtE5DydY1EpFO0WJc6KBUR1Qy3GYBMJVUFESJBCRjocA1pPom+pate2VDR3zLcJedORVhDUHiBUuuxW47wt1do5X+H3fAZs/Z+NW+4tYMH4Oif+LLUbrO+Q6KeE10JLdyNJ5SmEN146WZad+f8A+1dbOdtGZO7onO/MIwC4eQTWNomKpL29zYhvBv/HiNlKxl3AbLVnKSF6xJeHHhI+fjG3CgM6bMIsU3TVKzdjT6fkOzrW4paCMK2JWyswCDKWw3bGKP+RHZE86ZKLXWBraokh6WV4fazLEfXDfiALq6TDOLR669H4+NiOXI40bc0EsUXsZTR0TM9/Cs7O3fpcxNX6FybZJxpvKJ6qkTx5e27icDFvBD2M5am+DCutAyhzRrplSZIFWe5QGqiQSaGymkdJ4Fo9MoYlSGZFHwx8N1AcFIUPihCr1YbaeW6ZAfrwwRwoUE5jMeB88kOaOMaFD0MZvaYG5kY6+TWaOdTFPDnc06Q0PZIW22SUEXmnAmBSR7qAOTZ0IESREkNL46ACpPJuzT77brxeh+wLa5rENuE90oak4mvBTxJPmDbF/Zlq/rRGH3voiSDKbcdUevDMyr7XvfpA7NRmUT+l69gJ+DPPHCul6mu+3lveM6mjJgMEk+kc02jWSGoZAgC4wnUYQ6NLqD0ddEHluuIcVtcr+pfVqRcxuUTKxkrKF/9hWZzRNK";
+(() => {
+  const waitForConverter = (attempt = 0) => {
+    const mode = document.getElementById('pixelMode');
+    const upload = document.getElementById('pixelUpload');
+    if (!mode || !upload) return;
+    const ready = [...mode.options].some(o => /courbes|sans carrés|mystère/i.test(o.textContent));
+    if (!ready && attempt < 60) return setTimeout(() => waitForConverter(attempt + 1), 100);
+    initExampleConverter();
+  };
+
+  function initExampleConverter() {
+    if (window.__LION_EXAMPLE_MODE_READY__) return;
+    window.__LION_EXAMPLE_MODE_READY__ = true;
+
+    const clone = id => {
+      const old = document.getElementById(id);
+      if (!old) return null;
+      const el = old.cloneNode(true);
+      old.replaceWith(el);
+      return el;
+    };
+
+    const upload = clone('pixelUpload');
+    const grid = clone('gridSize');
+    const colors = clone('colorCount');
+    const mode = clone('pixelMode');
+    const download = clone('downloadPixel');
+    const printBtn = clone('printPixel');
+    const canvas = document.getElementById('pixelCanvas');
+    const ctx = canvas?.getContext('2d');
+    const legend = document.getElementById('pixelLegend');
+    const info = document.getElementById('pixelInfo');
+    const controls = document.getElementById('exampleControls');
+    const complexity = document.getElementById('exampleComplexity');
+    const merge = document.getElementById('exampleMerge');
+    const strokeWidth = document.getElementById('exampleStrokeWidth');
+    const strokeColor = document.getElementById('exampleStrokeColor');
+    if (!upload || !grid || !colors || !mode || !canvas || !ctx || !legend || !info) return;
+
+    grid.innerHTML = `
+      <option value="24">24 — simple</option>
+      <option value="32">32 — équilibré</option>
+      <option value="48">48 — détaillé</option>
+      <option value="64" selected>64 — portrait précis</option>
+      <option value="80">80 — très détaillé</option>`;
+    colors.innerHTML = `
+      <option value="4">4 couleurs</option><option value="6">6 couleurs</option>
+      <option value="8">8 couleurs</option><option value="10">10 couleurs</option>
+      <option value="12" selected>12 couleurs</option><option value="16">16 couleurs</option>`;
+    mode.innerHTML = `
+      <option value="example-numbered" selected>Mode Exemple — contour + numéros</option>
+      <option value="example-line">Mode Exemple — contour seul</option>
+      <option value="line-numbered">Dessin sans carrés — zones numérotées</option>
+      <option value="line-only">Dessin sans carrés — contours seuls</option>
+      <option value="mystery">Grille mystère numérotée</option>
+      <option value="color">Aperçu couleur</option>`;
+
+    let image = null;
+    let model = null;
+    const clamp = v => Math.max(0, Math.min(255, v));
+    const hex = c => '#' + c.map(v => Math.round(clamp(v)).toString(16).padStart(2,'0')).join('').toUpperCase();
+    const dist = (a,b) => .30*(a[0]-b[0])**2 + .59*(a[1]-b[1])**2 + .11*(a[2]-b[2])**2;
+    const lum = c => .2126*c[0] + .7152*c[1] + .0722*c[2];
+    const avg = pts => {
+      let r=0,g=0,b=0; for(const p of pts){r+=p[0];g+=p[1];b+=p[2];}
+      const n=Math.max(1,pts.length); return [r/n,g/n,b/n];
+    };
+    const range = (pts,k) => {
+      let lo=255,hi=0; for(const p of pts){lo=Math.min(lo,p[k]);hi=Math.max(hi,p[k]);}
+      return hi-lo;
+    };
+
+    function medianCut(pixels,count){
+      let boxes=[pixels.slice()];
+      while(boxes.length<count){
+        let bi=-1,score=-1,ch=0;
+        boxes.forEach((box,i)=>{
+          if(box.length<2)return;
+          const rs=[0,1,2].map(k=>range(box,k)), c=rs.indexOf(Math.max(...rs));
+          const s=rs[c]*Math.sqrt(box.length);
+          if(s>score){score=s;bi=i;ch=c;}
+        });
+        if(bi<0)break;
+        const box=boxes.splice(bi,1)[0].sort((a,b)=>a[ch]-b[ch]);
+        const m=Math.floor(box.length/2);boxes.push(box.slice(0,m),box.slice(m));
+      }
+      return boxes.map(avg);
+    }
+
+    function refine(pixels,palette,loops=9){
+      let cs=palette.map(c=>c.slice());
+      for(let n=0;n<loops;n++){
+        const buckets=cs.map(()=>[]);
+        for(const p of pixels){
+          let bi=0,bd=Infinity;
+          cs.forEach((c,i)=>{const d=dist(p,c);if(d<bd){bd=d;bi=i;}});
+          buckets[bi].push(p);
+        }
+        cs=cs.map((c,i)=>buckets[i].length?avg(buckets[i]):c);
+      }
+      return cs;
+    }
+
+    function cropRect(img,cols,rows){
+      const sa=img.width/img.height, da=cols/rows;
+      let sw=img.width,sh=img.height,sx=0,sy=0;
+      if(sa>da){sw=img.height*da;sx=(img.width-sw)/2;}
+      else if(sa<da){sh=img.width/da;sy=(img.height-sh)/2;}
+      const zoom=img.height>img.width?1.06:1.02;
+      const nw=sw/zoom,nh=sh/zoom;sx+=(sw-nw)/2;sy+=(sh-nh)/2;
+      return {sx,sy,sw:nw,sh:nh};
+    }
+
+    function majoritySmooth(a,cols,rows,loops=2){
+      let cur=a.slice();
+      for(let p=0;p<loops;p++){
+        const next=cur.slice();
+        for(let y=1;y<rows-1;y++)for(let x=1;x<cols-1;x++){
+          const count=new Map();
+          for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+            const v=cur[(y+dy)*cols+x+dx];count.set(v,(count.get(v)||0)+1);
+          }
+          let best=cur[y*cols+x],score=0;
+          count.forEach((n,v)=>{if(n>score){score=n;best=v;}});
+          if(score>=5)next[y*cols+x]=best;
+        }
+        cur=next;
+      }
+      return cur;
+    }
+
+    function regions(assignments,cols,rows){
+      const seen=new Uint8Array(cols*rows),out=[],dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+      for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
+        const start=y*cols+x;if(seen[start])continue;
+        const color=assignments[start],q=[start];seen[start]=1;const cells=[];let sx=0,sy=0;
+        while(q.length){
+          const idx=q.pop(),cx=idx%cols,cy=(idx/cols)|0;cells.push(idx);sx+=cx;sy+=cy;
+          for(const [dx,dy] of dirs){
+            const nx=cx+dx,ny=cy+dy;if(nx<0||ny<0||nx>=cols||ny>=rows)continue;
+            const ni=ny*cols+nx;if(!seen[ni]&&assignments[ni]===color){seen[ni]=1;q.push(ni);}
+          }
+        }
+        out.push({color,cells,size:cells.length,cx:sx/cells.length,cy:sy/cells.length});
+      }
+      return out;
+    }
+
+    function mergeTiny(assignments,cols,rows,minSize){
+      let cur=assignments.slice(),dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+      for(let pass=0;pass<5;pass++){
+        let changed=false;
+        for(const reg of regions(cur,cols,rows).sort((a,b)=>a.size-b.size)){
+          if(reg.size>=minSize)continue;
+          const neighbors=new Map();
+          for(const idx of reg.cells){
+            const x=idx%cols,y=(idx/cols)|0;
+            for(const [dx,dy] of dirs){
+              const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=cols||ny>=rows)continue;
+              const c=cur[ny*cols+nx];if(c!==reg.color)neighbors.set(c,(neighbors.get(c)||0)+1);
+            }
+          }
+          let best=reg.color,score=0;neighbors.forEach((n,c)=>{if(n>score){score=n;best=c;}});
+          if(best!==reg.color){reg.cells.forEach(i=>cur[i]=best);changed=true;}
+        }
+        if(!changed)break;
+      }
+      return cur;
+    }
+
+    function makeModel(img,isExample){
+      const settings={complexity:complexity?.value||'medium',merge:merge?.value||'strong'};
+      let target=+grid.value;
+      if(isExample)target=({low:48,medium:64,high:80})[settings.complexity]||64;
+      const count=+colors.value,aspect=img.width/img.height;
+      let cols,rows;if(aspect>=1){cols=target;rows=Math.max(1,Math.round(target/aspect));}else{rows=target;cols=Math.max(1,Math.round(target*aspect));}
+      const c=document.createElement('canvas');c.width=cols;c.height=rows;
+      const x=c.getContext('2d',{willReadFrequently:true});x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';
+      const cr=cropRect(img,cols,rows);x.drawImage(img,cr.sx,cr.sy,cr.sw,cr.sh,0,0,cols,rows);
+      const raw=x.getImageData(0,0,cols,rows).data,px=[];
+      for(let i=0;i<raw.length;i+=4){
+        let r=raw[i],g=raw[i+1],b=raw[i+2],gray=(r+g+b)/3;
+        r=clamp((r-128)*1.07+128);g=clamp((g-128)*1.07+128);b=clamp((b-128)*1.07+128);
+        r=clamp(gray+(r-gray)*1.10);g=clamp(gray+(g-gray)*1.10);b=clamp(gray+(b-gray)*1.10);
+        px.push([r,g,b]);
+      }
+      const palette=refine(px,medianCut(px,count),10).sort((a,b)=>lum(a)-lum(b));
+      let assignments=px.map(p=>{let bi=0,bd=Infinity;palette.forEach((cc,i)=>{const d=dist(p,cc);if(d<bd){bd=d;bi=i;}});return bi;});
+      assignments=majoritySmooth(assignments,cols,rows,isExample?3:2);
+      const base=Math.min(cols,rows);
+      const minSize=isExample?(settings.merge==='strong'?Math.max(8,Math.round(base*.13)):Math.max(5,Math.round(base*.08))):Math.max(4,Math.round(base*.06));
+      assignments=mergeTiny(assignments,cols,rows,minSize);
+      return {cols,rows,palette,assignments,settings};
+    }
+
+    const key=(x,y)=>`${x},${y}`;
+    function loopsFor(reg,cols,rows){
+      const cells=new Set(reg.cells),map=new Map();
+      const has=(x,y)=>x>=0&&y>=0&&x<cols&&y<rows&&cells.has(y*cols+x);
+      const add=(x1,y1,x2,y2)=>{const k=key(x1,y1);if(!map.has(k))map.set(k,[]);map.get(k).push([x2,y2]);};
+      for(const idx of reg.cells){
+        const x=idx%cols,y=(idx/cols)|0;
+        if(!has(x,y-1))add(x,y,x+1,y);if(!has(x+1,y))add(x+1,y,x+1,y+1);
+        if(!has(x,y+1))add(x+1,y+1,x,y+1);if(!has(x-1,y))add(x,y+1,x,y);
+      }
+      const out=[];
+      while(map.size){
+        const start=map.keys().next().value,[sx,sy]=start.split(',').map(Number),loop=[[sx,sy]];let cur=start,guard=0;
+        while(guard++<200000){const list=map.get(cur);if(!list?.length)break;const next=list.shift();if(!list.length)map.delete(cur);loop.push(next);cur=key(next[0],next[1]);if(cur===start)break;}
+        if(loop.length>4)out.push(loop);
+      }
+      return out;
+    }
+
+    const pDist=(p,a,b)=>{
+      const dx=b[0]-a[0],dy=b[1]-a[1];if(!dx&&!dy)return Math.hypot(p[0]-a[0],p[1]-a[1]);
+      const t=Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dy)/(dx*dx+dy*dy)));
+      return Math.hypot(p[0]-(a[0]+t*dx),p[1]-(a[1]+t*dy));
+    };
+    function simplify(points,tol){
+      let pts=points.slice();if(pts.length>1&&key(...pts[0])===key(...pts[pts.length-1]))pts.pop();
+      const rdp=arr=>{if(arr.length<=2)return arr;let max=0,idx=0;for(let i=1;i<arr.length-1;i++){const d=pDist(arr[i],arr[0],arr[arr.length-1]);if(d>max){max=d;idx=i;}}
+        if(max>tol){const l=rdp(arr.slice(0,idx+1)),r=rdp(arr.slice(idx));return l.slice(0,-1).concat(r);}return [arr[0],arr[arr.length-1]];};
+      const out=rdp(pts);if(out.length>2)out.push(out[0]);return out;
+    }
+    function chaikin(points,passes=3){
+      let pts=points.slice();if(pts.length>1&&key(...pts[0])===key(...pts[pts.length-1]))pts.pop();
+      for(let p=0;p<passes;p++){const next=[];for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length];next.push([.75*a[0]+.25*b[0],.75*a[1]+.25*b[1]],[.25*a[0]+.75*b[0],.25*a[1]+.75*b[1]]);}pts=next;}
+      if(pts.length)pts.push(pts[0]);return pts;
+    }
+
+    function drawExample(numbered){
+      const {cols,rows,palette,assignments,settings}=model,cell=Math.max(10,Math.floor(1000/Math.max(cols,rows)));
+      canvas.width=cols*cell;canvas.height=rows*cell;ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+      const strokeMap={light:'#aaa6a1',medium:'#77736f',dark:'#3f3b37'};
+      ctx.strokeStyle=strokeMap[strokeColor?.value||'light'];
+      ctx.lineWidth=(strokeWidth?.value||'fine')==='fine'?Math.max(.72,cell*.06):Math.max(1.1,cell*.095);
+      ctx.lineCap='round';ctx.lineJoin='round';
+      const regs=regions(assignments,cols,rows).sort((a,b)=>b.size-a.size);
+      for(const reg of regs){
+        if(reg.size<4)continue;
+        for(const raw of loopsFor(reg,cols,rows)){
+          const tol=settings.complexity==='high'?.38:settings.complexity==='low'?1.0:.62;
+          const curve=chaikin(simplify(raw,tol),settings.complexity==='high'?2:3);if(curve.length<4)continue;
+          ctx.beginPath();ctx.moveTo(curve[0][0]*cell,curve[0][1]*cell);for(let i=1;i<curve.length;i++)ctx.lineTo(curve[i][0]*cell,curve[i][1]*cell);ctx.closePath();ctx.stroke();
+        }
+      }
+      let labels=0;
+      if(numbered){
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        const minLabel=settings.merge==='strong'?Math.max(10,Math.round(Math.min(cols,rows)*.16)):7;
+        for(const reg of regs){
+          if(reg.size<minLabel)continue;const fs=Math.max(7,Math.min(cell*.52,Math.sqrt(reg.size)*cell*.18)),text=String(reg.color+1),x=(reg.cx+.5)*cell,y=(reg.cy+.5)*cell;
+          ctx.font=`600 ${fs}px Arial`;const w=ctx.measureText(text).width+5,h=fs+2;ctx.fillStyle='rgba(255,255,255,.95)';ctx.fillRect(x-w/2,y-h/2,w,h);ctx.fillStyle=strokeMap[strokeColor?.value||'medium'];ctx.fillText(text,x,y);labels++;
+        }
+      }
+      legend.innerHTML=palette.map((c,i)=>`<div class="swatch"><div class="swatch-color" style="background:${hex(c)}"></div><small>N° ${i+1}<br>${hex(c)}</small></div>`).join('');
+      info.textContent=`Mode Exemple • ${palette.length} couleurs • ${regs.length} zones${numbered?` • ${labels} numérotées`:''} • traits ${(strokeWidth?.value||'fine')==='fine'?'fins':'moyens'}`;
+    }
+
+    function render(){
+      if(!model)return;
+      const selected=mode.value,{cols,rows,palette,assignments}=model,cell=Math.max(10,Math.floor(980/Math.max(cols,rows)));
+      if(selected==='example-numbered'||selected==='example-line')return drawExample(selected==='example-numbered');
+      canvas.width=cols*cell;canvas.height=rows*cell;ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.lineJoin='round';ctx.lineCap='round';
+      if(selected==='color'||selected==='mystery'){
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
+          const i=y*cols+x,p=assignments[i];ctx.fillStyle=selected==='color'?hex(palette[p]):'#fff';ctx.fillRect(x*cell,y*cell,cell,cell);ctx.strokeStyle='rgba(40,30,20,.22)';ctx.strokeRect(x*cell+.5,y*cell+.5,cell,cell);
+          if(selected==='mystery'){ctx.fillStyle='#24170e';ctx.font=`700 ${Math.max(7,cell*.42)}px system-ui`;ctx.fillText(String(p+1),x*cell+cell/2,y*cell+cell/2);}
+        }
+      }else{
+        ctx.strokeStyle='#514b46';ctx.lineWidth=Math.max(.9,cell*.08);
+        for(const reg of regions(assignments,cols,rows))for(const loop of loopsFor(reg,cols,rows)){
+          const curve=chaikin(simplify(loop,.55),2);if(curve.length<4)continue;ctx.beginPath();ctx.moveTo(curve[0][0]*cell,curve[0][1]*cell);for(let i=1;i<curve.length;i++)ctx.lineTo(curve[i][0]*cell,curve[i][1]*cell);ctx.closePath();ctx.stroke();
+        }
+        if(selected==='line-numbered'){
+          ctx.textAlign='center';ctx.textBaseline='middle';for(const reg of regions(assignments,cols,rows)){if(reg.size<6)continue;const fs=Math.max(7,Math.min(cell*.55,Math.sqrt(reg.size)*cell*.19)),x=(reg.cx+.5)*cell,y=(reg.cy+.5)*cell;ctx.font=`600 ${fs}px Arial`;ctx.fillStyle='#fff';ctx.fillRect(x-fs*.5,y-fs*.5,fs,fs);ctx.fillStyle='#514b46';ctx.fillText(String(reg.color+1),x,y);}
+        }
+      }
+      legend.innerHTML=palette.map((c,i)=>`<div class="swatch"><div class="swatch-color" style="background:${hex(c)}"></div><small>N° ${i+1}<br>${hex(c)}</small></div>`).join('');
+      info.textContent=`${cols} × ${rows} • ${palette.length} couleurs`;
+    }
+
+    function regenerate(){
+      if(!image)return;const isExample=mode.value.startsWith('example');info.textContent=isExample?'Création du Mode Exemple…':'Analyse de l’image…';
+      setTimeout(()=>{model=makeModel(image,isExample);render();},20);
+    }
+
+    const toggleControls=()=>{if(controls)controls.hidden=!mode.value.startsWith('example');};
+    toggleControls();
+    upload.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const im=new Image();im.onload=()=>{image=im;regenerate();};im.src=ev.target.result;};r.readAsDataURL(f);});
+    grid.addEventListener('change',regenerate);colors.addEventListener('change',regenerate);
+    mode.addEventListener('change',()=>{toggleControls();regenerate();});
+    [complexity,merge,strokeWidth,strokeColor].forEach(el=>el?.addEventListener('change',regenerate));
+    download?.addEventListener('click',()=>{if(!model)return;const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download=mode.value.startsWith('example')?'lion-dynasty-mode-exemple.png':'lion-dynasty-coloriage.png';a.click();});
+    printBtn?.addEventListener('click',()=>{if(!model)return;const data=canvas.toDataURL('image/png'),leg=model.palette.map((c,i)=>`<span style="display:inline-flex;align-items:center;gap:5px;margin:3px 5px;font:12px Arial"><i style="width:18px;height:18px;background:${hex(c)};border:1px solid #aaa;display:inline-block"></i><b>${i+1}</b> ${hex(c)}</span>`).join(''),w=window.open('','_blank');w.document.write(`<title>Lion Dynasty — Mode Exemple</title><style>body{margin:18px;font-family:Arial}img{max-width:100%;max-height:78vh;display:block;margin:auto}.legend{text-align:center;margin-top:12px}@media print{button{display:none}}</style><img src="${data}"><div class="legend">${leg}</div><script>onload=()=>setTimeout(()=>print(),150)<\/script>`);w.document.close();});
+  }
+
+  waitForConverter();
+})();
