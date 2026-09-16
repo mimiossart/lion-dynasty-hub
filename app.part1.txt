@@ -1,0 +1,247 @@
+(() => {
+"use strict";
+
+const cfg = window.LION_DYNASTY_CONFIG || {};
+const configured =
+  cfg.supabaseUrl &&
+  cfg.supabasePublishableKey &&
+  !cfg.supabaseUrl.includes("YOUR_") &&
+  !cfg.supabasePublishableKey.includes("YOUR_");
+
+
+let db = null;
+let currentUser = null;
+let currentProfile = null;
+let posts = [];
+let trackerState = {};
+let realtimeChannel = null;
+let authMode = "signin";
+let pendingPostFile = null;
+
+if (configured && window.supabase) {
+  db = window.supabase.createClient(cfg.supabaseUrl, cfg.supabasePublishableKey, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+  });
+}
+
+const collections = [
+  {id:"t1", title:"Tome 1 Disney", pages:["Page 1","Page 7","Page 12","Page 18"]},
+  {id:"gc", title:"Grands Classiques", pages:["Page 3","Page 9","Page 16","Page 22"]},
+  {id:"ar", title:"Animaux Royaux", pages:["Lion","Panthère","Paon","Tigre"]}
+];
+
+const solutions = [
+  {book:"Tome 1 Disney", page:"Page 7", result:"Château au coucher de soleil", image:"https://pub.bestcoloringpages.ai/coloring_page/user/previews/fairy-tale-castle-at-sunset.png"},
+  {book:"Tome 1 Disney", page:"Page 12", result:"Forêt enchantée"},
+  {book:"Grands Classiques", page:"Page 9", result:"Bal royal"},
+  {book:"Grands Classiques", page:"Page 16", result:"Scène marine"},
+  {book:"Animaux Royaux", page:"Lion", result:"Portrait doré"},
+  {book:"Animaux Royaux", page:"Paon", result:"Plumes émeraude"}
+];
+
+function toast(message) {
+  const t = document.getElementById("toast");
+  t.textContent = message;
+  t.classList.add("show");
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+function escapeHTML(value="") {
+  return String(value).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
+}
+
+function initials(name="LD") {
+  return name.trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase() || "LD";
+}
+
+function openModal(id) {
+  const el = document.getElementById(id);
+  el.classList.add("open");
+  el.setAttribute("aria-hidden","false");
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal(id) {
+  const el = document.getElementById(id);
+  el.classList.remove("open");
+  el.setAttribute("aria-hidden","true");
+  if (!document.querySelector(".modal.open")) document.body.style.overflow = "";
+}
+
+document.querySelectorAll("[data-close]").forEach(btn =>
+  btn.addEventListener("click", () => closeModal(btn.dataset.close))
+);
+document.querySelectorAll(".modal").forEach(modal =>
+  modal.addEventListener("click", e => {
+    if (e.target === modal) closeModal(modal.id);
+  })
+);
+
+function requireConfigured() {
+  if (!db) {
+    toast("Service temporairement indisponible");
+    return false;
+  }
+  return true;
+}
+
+function requireAuth() {
+  if (!requireConfigured()) return false;
+  if (!currentUser) {
+    setAuthMode("signin");
+    openModal("authModal");
+    toast("Connecte-toi pour continuer");
+    return false;
+  }
+  return true;
+}
+
+// ---------- Auth ----------
+function setAuthMode(mode) {
+  authMode = mode;
+  const signup = mode === "signup";
+  document.getElementById("signupFields").hidden = !signup;
+  document.getElementById("authTitle").textContent = signup ? "Créer mon compte" : "Se connecter";
+  document.getElementById("authSubmit").textContent = signup ? "Créer mon compte" : "Se connecter";
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.mode === mode));
+  document.getElementById("passwordInput").autocomplete = signup ? "new-password" : "current-password";
+}
+
+document.querySelectorAll(".tab").forEach(tab =>
+  tab.addEventListener("click", () => setAuthMode(tab.dataset.mode))
+);
+
+function openAccount() {
+  if (!configured) {
+    toast("Service temporairement indisponible");
+    return;
+  }
+  if (currentUser) document.getElementById("profile").scrollIntoView({behavior:"smooth"});
+  else {
+    setAuthMode("signin");
+    openModal("authModal");
+  }
+}
+
+document.getElementById("accountButton").addEventListener("click", openAccount);
+document.getElementById("heroAccount").addEventListener("click", () => {
+  if (!configured) return openAccount();
+  if (currentUser) return document.getElementById("profile").scrollIntoView({behavior:"smooth"});
+  setAuthMode("signup");
+  openModal("authModal");
+});
+
+document.getElementById("authForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!requireConfigured()) return;
+
+  const email = document.getElementById("emailInput").value.trim();
+  const password = document.getElementById("passwordInput").value;
+  const submit = document.getElementById("authSubmit");
+  submit.disabled = true;
+
+  try {
+    if (authMode === "signup") {
+      const displayName = document.getElementById("displayNameInput").value.trim();
+      const username = normalizeUsername(document.getElementById("usernameInput").value);
+      const bio = document.getElementById("bioInput").value.trim();
+      if (!displayName || !username) throw new Error("Nom et pseudo requis.");
+
+      const { data, error } = await db.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { display_name: displayName, username, bio },
+          emailRedirectTo: window.location.origin
+        }
+      });
+      if (error) throw error;
+      closeModal("authModal");
+
+      if (data.session) {
+        toast("Compte créé et connecté ✓");
+      } else {
+        toast("Compte créé — vérifie ton e-mail pour confirmer");
+      }
+    } else {
+      const { error } = await db.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      closeModal("authModal");
+      toast("Connexion réussie ✓");
+    }
+  } catch (err) {
+    if (err?.code === "email_not_confirmed" || /email not confirmed/i.test(err?.message || "")) {
+      toast("E-mail non confirmé — clique sur le lien reçu ou renvoie un e-mail de confirmation.");
+    } else {
+      toast(err.message || "Erreur d’authentification");
+    }
+  } finally {
+    submit.disabled = false;
+  }
+});
+
+document.getElementById("resendConfirmation").addEventListener("click", async () => {
+  if (!requireConfigured()) return;
+  const email = document.getElementById("emailInput").value.trim();
+  if (!email) return toast("Entre d’abord ton adresse e-mail.");
+  const btn = document.getElementById("resendConfirmation");
+  btn.disabled = true;
+  try {
+    const { error } = await db.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: window.location.origin }
+    });
+    if (error) throw error;
+    toast("Nouvel e-mail de confirmation envoyé ✓");
+  } catch (err) {
+    toast(err.message || "Impossible de renvoyer l’e-mail");
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+function normalizeUsername(v) {
+  return v.trim().replace(/^@/,"").toLowerCase().replace(/[^a-z0-9_]/g,"_").replace(/_+/g,"_").slice(0,24);
+}
+
+async function loadProfile() {
+  if (!db || !currentUser) { currentProfile = null; return; }
+
+  const { data, error } = await db.from("lion_profiles").select("*").eq("id", currentUser.id).maybeSingle();
+  if (error) console.warn(error);
+
+  if (data) {
+    currentProfile = data;
+    return;
+  }
+
+  // Permet à un compte Auth déjà présent dans ce projet Supabase
+  // de rejoindre Lion Dynasty sans toucher aux profils de l'autre application.
+  const metaUsername = normalizeUsername(currentUser.user_metadata?.username || "");
+  const fallback = {
+    id: currentUser.id,
+    username: metaUsername || `membre_${currentUser.id.slice(0,6)}`,
+    display_name: currentUser.user_metadata?.display_name || "Membre Lion Dynasty",
+    bio: currentUser.user_metadata?.bio || ""
+  };
+
+  const { data: created, error: createError } = await db
+    .from("lion_profiles")
+    .upsert(fallback, { onConflict: "id" })
+    .select("*")
+    .single();
+
+  if (createError) {
+    console.warn(createError);
+    currentProfile = fallback;
+  } else {
+    currentProfile = created;
+  }
+}
+
+function updateAccountUI() {
+  c
