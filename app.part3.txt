@@ -1,0 +1,203 @@
+" type="button">Supprimer</button>` : ""}
+        </div>
+        <div class="comments" id="comments-${p.id}">
+          <div class="comment-list">
+            ${p.comments.length ? p.comments.map(c => {
+              const cp = c.author || {};
+              return `<div class="comment"><strong>@${escapeHTML(cp.username || "membre")}</strong><br>${escapeHTML(c.body)}</div>`;
+            }).join("") : `<span class="form-note">Aucun commentaire pour le moment.</span>`}
+          </div>
+          <form class="comment-form" data-id="${p.id}">
+            <input class="field" maxlength="180" placeholder="Écrire un commentaire…">
+            <button class="icon-btn" type="submit">Envoyer</button>
+          </form>
+        </div>
+      </div>
+    </article>`;
+  }).join("");
+
+  grid.querySelectorAll(".like-btn").forEach(btn => btn.addEventListener("click", () => toggleLike(btn.dataset.id)));
+  grid.querySelectorAll(".comment-toggle").forEach(btn => btn.addEventListener("click", () => {
+    document.getElementById(`comments-${btn.dataset.id}`).classList.toggle("open");
+  }));
+  grid.querySelectorAll(".comment-form").forEach(form => form.addEventListener("submit", e => {
+    e.preventDefault();
+    addComment(form.dataset.id, form.querySelector("input").value);
+  }));
+  grid.querySelectorAll(".delete-post").forEach(btn => btn.addEventListener("click", () => deletePost(btn.dataset.id)));
+}
+
+["gallerySearch","galleryBook","gallerySort"].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener(id === "gallerySearch" ? "input" : "change", renderGallery);
+});
+
+document.getElementById("openPublish").addEventListener("click", () => {
+  if (!requireAuth()) return;
+  pendingPostFile = null;
+  document.getElementById("publishForm").reset();
+  document.getElementById("postPreview").hidden = true;
+  openModal("publishModal");
+});
+
+document.getElementById("postImageInput").addEventListener("change", e => {
+  const file = e.target.files[0];
+  pendingPostFile = file || null;
+  const preview = document.getElementById("postPreview");
+  if (!file) return preview.hidden = true;
+  preview.querySelector("img").src = URL.createObjectURL(file);
+  preview.hidden = false;
+});
+
+async function optimizeImage(file) {
+  const dataUrl = await new Promise((resolve,reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => resolve(reader.result);
+    reader.readAsDataURL(file);
+  });
+
+  const img = await new Promise((resolve,reject) => {
+    const i = new Image();
+    i.onerror = reject;
+    i.onload = () => resolve(i);
+    i.src = dataUrl;
+  });
+
+  const maxSide = 1600;
+  const scale = Math.min(1, maxSide / Math.max(img.width,img.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(img.width * scale);
+  canvas.height = Math.round(img.height * scale);
+  canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
+
+  return await new Promise(resolve => canvas.toBlob(resolve,"image/jpeg",0.82));
+}
+
+document.getElementById("publishForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!requireAuth()) return;
+  if (!pendingPostFile) return toast("Ajoute une photo");
+
+  const submit = document.getElementById("publishSubmit");
+  submit.disabled = true;
+  submit.textContent = "Publication…";
+
+  let uploadedPath = null;
+  try {
+    const blob = await optimizeImage(pendingPostFile);
+    const filename = `${crypto.randomUUID()}.jpg`;
+    uploadedPath = `${currentUser.id}/${filename}`;
+
+    const { error: uploadError } = await db.storage
+      .from("lion_colorings")
+      .upload(uploadedPath, blob, { contentType:"image/jpeg", upsert:false });
+    if (uploadError) throw uploadError;
+
+    const { data: publicData } = db.storage.from("lion_colorings").getPublicUrl(uploadedPath);
+    const imageUrl = publicData.publicUrl;
+
+    const { error: insertError } = await db.from("lion_posts").insert({
+      user_id: currentUser.id,
+      title: document.getElementById("postTitleInput").value.trim(),
+      book: document.getElementById("postBookInput").value,
+      page: document.getElementById("postPageInput").value.trim(),
+      material: document.getElementById("postMaterialInput").value.trim(),
+      description: document.getElementById("postDescriptionInput").value.trim(),
+      image_path: uploadedPath,
+      image_url: imageUrl
+    });
+    if (insertError) throw insertError;
+
+    closeModal("publishModal");
+    toast("Coloriage publié ✓");
+    await loadPosts();
+  } catch (err) {
+    if (uploadedPath) await db.storage.from("lion_colorings").remove([uploadedPath]);
+    toast(err.message || "Échec de la publication");
+    console.warn(err);
+  } finally {
+    submit.disabled = false;
+    submit.textContent = "Publier";
+  }
+});
+
+async function toggleLike(postId) {
+  if (!requireAuth()) return;
+  const post = posts.find(p => p.id === postId);
+  if (!post) return;
+  const liked = post.likes.some(l => l.user_id === currentUser.id);
+
+  const response = liked
+    ? await db.from("lion_likes").delete().eq("post_id",postId).eq("user_id",currentUser.id)
+    : await db.from("lion_likes").insert({post_id:postId,user_id:currentUser.id});
+
+  if (response.error) toast(response.error.message);
+  else await loadPosts();
+}
+
+async function addComment(postId, text) {
+  if (!requireAuth()) return;
+  const body = text.trim();
+  if (!body) return;
+  const { error } = await db.from("lion_comments").insert({
+    post_id: postId, user_id: currentUser.id, body
+  });
+  if (error) toast(error.message);
+  else {
+    await loadPosts();
+    setTimeout(() => document.getElementById(`comments-${postId}`)?.classList.add("open"), 0);
+  }
+}
+
+async function deletePost(postId) {
+  if (!requireAuth()) return;
+  const post = posts.find(p => p.id === postId);
+  if (!post || post.user_id !== currentUser.id) return;
+  if (!confirm("Supprimer définitivement cette publication ?")) return;
+
+  const { error } = await db.from("lion_posts").delete().eq("id",postId).eq("user_id",currentUser.id);
+  if (error) return toast(error.message);
+
+  if (post.image_path) await db.storage.from("lion_colorings").remove([post.image_path]);
+  toast("Publication supprimée");
+  await loadPosts();
+}
+
+function setupRealtime() {
+  if (!db) return;
+  if (realtimeChannel) db.removeChannel(realtimeChannel);
+  realtimeChannel = db.channel("lion-dynasty-community")
+    .on("postgres_changes",{event:"*",schema:"public",table:"lion_posts"},() => loadPosts())
+    .on("postgres_changes",{event:"*",schema:"public",table:"lion_likes"},() => loadPosts())
+    .on("postgres_changes",{event:"*",schema:"public",table:"lion_comments"},() => loadPosts())
+    .subscribe();
+}
+
+// ---------- Profile ----------
+function renderProfile() {
+  const target = document.getElementById("profileContent");
+
+  if (!configured) {
+    target.innerHTML = `<div class="empty"><h3>Service momentanément indisponible</h3><p>Réessaie dans quelques instants.</p></div>`;
+    return;
+  }
+
+  if (!currentUser) {
+    target.innerHTML = `<div class="empty"><h3>Ton espace membre t’attend</h3><p>Crée un compte pour publier, aimer, commenter et synchroniser ton tracker.</p><button class="btn btn-primary" id="profileSignup" type="button">Créer mon compte</button></div>`;
+    document.getElementById("profileSignup").addEventListener("click",() => {
+      setAuthMode("signup"); openModal("authModal");
+    });
+    return;
+  }
+
+  const mine = posts.filter(p => p.user_id === currentUser.id);
+  const likes = mine.reduce((sum,p) => sum + p.likes.length,0);
+  const p = currentProfile || {};
+  target.innerHTML = `<div class="profile-shell">
+    <article class="card profile-card">
+      <div class="author-line">
+        <div class="avatar lg">${initials(p.display_name || "LD")}</div>
+        <div><h3>${escapeHTML(p.display_name || "Membre")}</h3><div class="handle" style="color:#ddcdbf">@${escapeHTML(p.username || "membre")}</div></div>
+      </div>
+      <p>${escapeHTML(p.bio || "Ajoute une bio pour présen
