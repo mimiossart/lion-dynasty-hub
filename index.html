@@ -47,7 +47,7 @@
         <div class="stats">
           <div class="stat"><strong>☁</strong><span>Synchronisé</span></div>
           <div class="stat"><strong>♡</strong><span>Communautaire</span></div>
-          <div class="stat"><strong>🔒</strong><span>Sécurisé</span></div>
+          <div class="stat"><strong>🔒</strong><span>RLS sécurisé</span></div>
         </div>
       </aside>
     </div>
@@ -58,7 +58,7 @@
       <div class="shell">
         <div class="section-head">
           <div><span class="eyebrow">01 — Collection</span><h2>Tracker synchronisé</h2></div>
-          <p>Une fois connecté, chaque case cochée est enregistrée dans ton compte et retrouvée sur tes autres appareils.</p>
+          <p>Une fois connecté, chaque case cochée est enregistrée dans ton compte Supabase et retrouvée sur tes autres appareils.</p>
         </div>
         <div class="grid-3" id="collectionGrid"></div>
       </div>
@@ -133,7 +133,7 @@
       <div class="shell">
         <div class="section-head">
           <div><span class="eyebrow">05 — Viral Lab</span><h2>Outils & Générateurs</h2></div>
-          <p>Nuancier partageable et convertisseur de photo en grille mystère numérotée.</p>
+          <p>Nuancier partageable et convertisseur de photo en grille mystère, aperçu couleur ou vrai dessin sans carrés.</p>
         </div>
 
         <div class="tool-grid">
@@ -159,26 +159,33 @@
 
           <article class="card">
             <h3>Pixel Art Converter</h3>
-            <p>Importe une photo et transforme-la en grille mystère avec palette extraite de l’image.</p>
+            <p>Importe une photo et transforme-la en grille mystère, aperçu couleur, ou dessin en contours noirs avec zones numérotées. Version optimisée pour mieux rendre les visages et ajouter plus de couleurs.</p>
             <input class="field" id="pixelUpload" type="file" accept="image/*">
             <div class="tool-row">
               <label>Définition
                 <select class="field" id="gridSize">
                   <option value="24">24 cases — simple</option>
-                  <option value="32" selected>32 cases — équilibré</option>
+                  <option value="32">32 cases — équilibré</option>
                   <option value="48">48 cases — détaillé</option>
+                  <option value="64" selected>64 cases — portrait précis</option>
+                  <option value="80">80 cases — très détaillé</option>
                 </select>
               </label>
               <label>Couleurs
                 <select class="field" id="colorCount">
                   <option value="4">4 couleurs</option>
-                  <option value="6" selected>6 couleurs</option>
+                  <option value="6">6 couleurs</option>
                   <option value="8">8 couleurs</option>
+                  <option value="10">10 couleurs</option>
+                  <option value="12" selected>12 couleurs</option>
+                  <option value="16">16 couleurs</option>
                 </select>
               </label>
             </div>
             <select class="field" id="pixelMode">
               <option value="mystery">Grille mystère numérotée</option>
+              <option value="line-numbered" selected>Dessin sans carrés — zones numérotées</option>
+              <option value="line-only">Dessin sans carrés — contours seuls</option>
               <option value="color">Aperçu couleur</option>
             </select>
             <div class="canvas-wrap"><canvas id="pixelCanvas" width="640" height="430"></canvas></div>
@@ -192,11 +199,11 @@
         </div>
       </div>
     </section>
-  </main>
+</main>
 
   <footer class="footer">
     <div class="shell footer-inner">
-      <strong>Lion Dynasty Coloring Hub</strong>
+      <strong>Lion Dynasty Coloring Hub — V4</strong>
       <span>Le Hub communautaire des passionnés de coloriage</span>
     </div>
   </footer>
@@ -222,7 +229,8 @@
         <label>E-mail<input class="field" id="emailInput" type="email" autocomplete="email" required></label>
         <label>Mot de passe<input class="field" id="passwordInput" type="password" minlength="8" autocomplete="current-password" required></label>
         <button class="btn btn-primary" id="authSubmit" type="submit">Se connecter</button>
-        <div class="form-note">Le mot de passe est géré de façon sécurisée et n’est jamais enregistré par le code du site.</div>
+        <button class="btn btn-secondary" id="resendConfirmation" type="button">Renvoyer l’e-mail de confirmation</button>
+        <div class="form-note">Le mot de passe est géré par Supabase Auth et n’est jamais enregistré par le code du site. Les liens de confirmation reviennent vers ce site.</div>
       </form>
     </div>
   </div>
