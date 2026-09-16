@@ -1,4 +1,11 @@
 (async () => {
+  if (!document.getElementById("resendConfirmation")) {
+    const hiddenResend = document.createElement("button");
+    hiddenResend.id = "resendConfirmation";
+    hiddenResend.type = "button";
+    hiddenResend.hidden = true;
+    document.body.appendChild(hiddenResend);
+  }
   const files = ["app.part1.txt","app.part2.txt","app.part3.txt","app.part4.txt","app.part5.txt"];
   const parts = await Promise.all(files.map(async file => {
     const response = await fetch(file, { cache: "no-store" });
