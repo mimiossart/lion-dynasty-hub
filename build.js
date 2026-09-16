@@ -11,7 +11,8 @@ const files = [
   'app.part2.txt',
   'app.part3.txt',
   'app.part4.txt',
-  'app.part5.txt'
+  'app.part5.txt',
+  'example-mode-v2.js'
 ];
 
 const out = path.join(process.cwd(), 'dist');
@@ -23,5 +24,12 @@ for (const file of files) {
   fs.copyFileSync(file, path.join(out, file));
 }
 
+const indexPath = path.join(out, 'index.html');
+let html = fs.readFileSync(indexPath, 'utf8');
+if (!html.includes('example-mode-v2.js')) {
+  html = html.replace('</body>', '  <script src="example-mode-v2.js"></script>\n</body>');
+  fs.writeFileSync(indexPath, html, 'utf8');
+}
+
 console.log(`Lion Dynasty: ${files.length} fichiers de production copiés dans dist/.`);
-console.log('Lion Dynasty: Mode Exemple prêt.');
+console.log('Lion Dynasty: Mode Exemple V2 haute résolution prêt.');
