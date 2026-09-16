@@ -16,8 +16,7 @@
 
   let source = parts.join("");
 
-  // Amélioration du Pixel Art Converter : davantage de détails, meilleur cadrage
-  // des portraits et davantage de couleurs, sans modifier le reste de l'application.
+  // Haute fidélité portrait : davantage de détails et davantage de couleurs.
   const pixelModelPattern = /function makePixelModel\(img\) \{[\s\S]*?return \{cols,rows,palette,assignments\};\n\}/;
   const improvedPixelModel = `function clampPixel(v,min=0,max=255){return Math.max(min,Math.min(max,v));}
 function enhancePixelColor(p){
@@ -75,9 +74,109 @@ function makePixelModel(img) {
     console.warn("Lion Dynasty: ancien moteur Pixel Art introuvable, moteur d'origine conservé.");
   }
 
+  // Nouveau rendu : dessin en contours noirs, sans grille de carrés, avec zones numérotées.
+  const renderPixelPattern = /function renderPixel\(\) \{[\s\S]*?\n\}(?=\nfunction regenPixel\(\))/;
+  const improvedRenderPixel = `function pixelRegionAt(assignments,cols,x,y){return assignments[y*cols+x];}
+function computePixelRegions(cols,rows,assignments){
+  const seen=new Uint8Array(cols*rows);
+  const regions=[];
+  const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
+    const start=y*cols+x;
+    if(seen[start])continue;
+    const colorIndex=assignments[start];
+    const stack=[start];
+    seen[start]=1;
+    let size=0,sumX=0,sumY=0;
+    while(stack.length){
+      const idx=stack.pop();
+      const cx=idx%cols,cy=Math.floor(idx/cols);
+      size++;sumX+=cx;sumY+=cy;
+      for(const [dx,dy] of dirs){
+        const nx=cx+dx,ny=cy+dy;
+        if(nx<0||ny<0||nx>=cols||ny>=rows)continue;
+        const nidx=ny*cols+nx;
+        if(!seen[nidx]&&assignments[nidx]===colorIndex){seen[nidx]=1;stack.push(nidx);}
+      }
+    }
+    regions.push({colorIndex,size,cx:sumX/size,cy:sumY/size});
+  }
+  return regions;
+}
+function drawLineArt(cols,rows,palette,assignments,cell,numbered){
+  pixelCanvas.width=cols*cell;pixelCanvas.height=rows*cell;
+  pctx.fillStyle="#fff";pctx.fillRect(0,0,pixelCanvas.width,pixelCanvas.height);
+  pctx.strokeStyle="#201711";
+  pctx.lineWidth=Math.max(1.15,cell*.095);
+  pctx.lineCap="round";pctx.lineJoin="round";
+  pctx.beginPath();
+  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
+    const cur=pixelRegionAt(assignments,cols,x,y);
+    const x0=x*cell,y0=y*cell,x1=x0+cell,y1=y0+cell;
+    if(x===0){pctx.moveTo(x0,y0);pctx.lineTo(x0,y1);}
+    if(y===0){pctx.moveTo(x0,y0);pctx.lineTo(x1,y0);}
+    if(x===cols-1||pixelRegionAt(assignments,cols,x+1,y)!==cur){pctx.moveTo(x1,y0);pctx.lineTo(x1,y1);}
+    if(y===rows-1||pixelRegionAt(assignments,cols,x,y+1)!==cur){pctx.moveTo(x0,y1);pctx.lineTo(x1,y1);}
+  }
+  pctx.stroke();
+  if(numbered){
+    const regions=computePixelRegions(cols,rows,assignments);
+    pctx.textAlign="center";pctx.textBaseline="middle";
+    for(const region of regions){
+      if(region.size<3)continue;
+      const fontSize=Math.max(8,Math.min(cell*.56,Math.sqrt(region.size)*cell*.24));
+      const label=String(region.colorIndex+1);
+      const px=(region.cx+.5)*cell,py=(region.cy+.5)*cell;
+      pctx.font="700 "+fontSize+"px system-ui";
+      const tw=pctx.measureText(label).width;
+      pctx.fillStyle="rgba(255,255,255,.94)";
+      pctx.fillRect(px-tw/2-2,py-fontSize*.48,tw+4,fontSize*.96);
+      pctx.fillStyle="#2b211a";
+      pctx.fillText(label,px,py);
+    }
+  }
+}
+function renderPixel() {
+  if(!pixelModel)return drawPixelPlaceholder();
+  const {cols,rows,palette,assignments}=pixelModel;
+  const mode=document.getElementById("pixelMode").value;
+  const cell=Math.max(10,Math.floor(920/Math.max(cols,rows)));
+  if(mode==="line-numbered"||mode==="line-only"){
+    drawLineArt(cols,rows,palette,assignments,cell,mode==="line-numbered");
+  } else {
+    pixelCanvas.width=cols*cell;pixelCanvas.height=rows*cell;
+    pctx.textAlign="center";pctx.textBaseline="middle";
+    for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
+      const idx=y*cols+x,p=assignments[idx],c=palette[p];
+      pctx.fillStyle=mode==="color"?hex(c):"#fff";pctx.fillRect(x*cell,y*cell,cell,cell);
+      pctx.strokeStyle="rgba(45,34,25,.28)";pctx.strokeRect(x*cell+.5,y*cell+.5,cell,cell);
+      if(mode==="mystery"){pctx.fillStyle="#2b211a";pctx.font="700 "+Math.max(7,Math.floor(cell*.45))+"px system-ui";pctx.fillText(String(p+1),x*cell+cell/2,y*cell+cell/2);}
+    }
+  }
+  document.getElementById("pixelLegend").innerHTML=palette.map((c,i)=>"<div class=\"swatch\"><div class=\"swatch-color\" style=\"background:"+hex(c)+"\"></div><small>N° "+(i+1)+"<br>"+hex(c)+"</small></div>").join("");
+  const infos={
+    mystery:cols+" × "+rows+" cases • "+palette.length+" couleurs • grille mystère numérotée",
+    color:cols+" × "+rows+" cases • "+palette.length+" couleurs • aperçu couleur",
+    "line-numbered":palette.length+" couleurs • dessin sans carrés • zones numérotées",
+    "line-only":palette.length+" couleurs • dessin en contours noirs"
+  };
+  document.getElementById("pixelInfo").textContent=infos[mode]||(cols+" × "+rows+" • "+palette.length+" couleurs");
+}`;
+
+  if (renderPixelPattern.test(source)) {
+    source = source.replace(renderPixelPattern, improvedRenderPixel);
+  } else {
+    console.warn("Lion Dynasty: moteur de rendu Pixel Art introuvable, rendu d'origine conservé.");
+  }
+
+  // Impression et téléchargement adaptés au nouveau mode dessin.
   source = source.replace(
-    'document.getElementById("pixelInfo").textContent=`${cols} × ${rows} cases • ${palette.length} couleurs • proportions conservées`;',
-    'document.getElementById("pixelInfo").textContent=`${cols} × ${rows} cases • ${palette.length} couleurs • cadrage optimisé pour mieux faire ressortir le sujet`;'
+    'const a=document.createElement("a");a.href=pixelCanvas.toDataURL("image/png");a.download="lion-dynasty-grille.png";a.click();',
+    'const a=document.createElement("a");a.href=pixelCanvas.toDataURL("image/png");const mode=document.getElementById("pixelMode").value;a.download=mode.startsWith("line")?"lion-dynasty-dessin.png":"lion-dynasty-grille.png";a.click();'
+  );
+  source = source.replace(
+    'document.getElementById("pixelMode").value="mystery";renderPixel();',
+    'if(old==="color") document.getElementById("pixelMode").value="line-numbered";renderPixel();'
   );
 
   (0, eval)(source);
@@ -106,10 +205,20 @@ function makePixelModel(img) {
     colorCount.value = "12";
   }
 
+  const modeSelect = document.getElementById("pixelMode");
+  if (modeSelect) {
+    modeSelect.innerHTML = `
+      <option value="mystery">Grille mystère numérotée</option>
+      <option value="line-numbered" selected>Dessin sans carrés — zones numérotées</option>
+      <option value="line-only">Dessin sans carrés — contours seuls</option>
+      <option value="color">Aperçu couleur</option>`;
+    modeSelect.value = "line-numbered";
+  }
+
   const upload = document.getElementById("pixelUpload");
   const pixelCard = upload?.closest(".card");
   const intro = pixelCard?.querySelector("p");
-  if (intro) intro.textContent = "Importe une photo : le mode portrait conserve davantage de détails du visage et propose jusqu’à 16 couleurs.";
+  if (intro) intro.textContent = "Importe une photo et transforme-la en vrai dessin de coloriage : contours noirs, sans grille de carrés, avec zones numérotées. Jusqu’à 16 couleurs.";
 })().catch(error => {
   console.error("Lion Dynasty app loading error", error);
   const toast = document.getElementById("toast");
