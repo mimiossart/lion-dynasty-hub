@@ -1,0 +1,171 @@
+ter ton univers de coloriage.")}</p>
+      <div class="profile-stats">
+        <div class="profile-stat"><strong>${mine.length}</strong><span>publications</span></div>
+        <div class="profile-stat"><strong>${likes}</strong><span>j’aime reçus</span></div>
+        <div class="profile-stat"><strong>${completedCount()}</strong><span>pages cochées</span></div>
+      </div>
+      <div class="cta-row">
+        <button class="btn light" id="editProfile" type="button">Modifier</button>
+        <button class="btn btn-secondary" id="logoutButton" type="button">Déconnexion</button>
+      </div>
+    </article>
+    <article class="card">
+      <div class="collection-top"><div><h3>Mes créations</h3><div class="form-note">${mine.length ? "Tes dernières publications" : "Pas encore de publication"}</div></div><button class="btn btn-secondary" id="profilePublish" type="button">＋ Publier</button></div>
+      ${mine.length ? `<div class="profile-posts">${mine.slice(0,6).map(post => `<div class="profile-mini"><div class="mini-cover"><img src="${escapeHTML(post.image_url)}" alt=""></div><div class="mini-copy"><strong>${escapeHTML(post.title)}</strong><div class="small">♥ ${post.likes.length} · 💬 ${post.comments.length}</div></div></div>`).join("")}</div>` : `<div class="empty" style="margin-top:14px">Publie ton premier coloriage pour le retrouver ici.</div>`}
+    </article>
+  </div>`;
+
+  document.getElementById("profilePublish").addEventListener("click",() => document.getElementById("openPublish").click());
+  document.getElementById("editProfile").addEventListener("click",() => {
+    document.getElementById("profileName").value = p.display_name || "";
+    document.getElementById("profileUsername").value = p.username || "";
+    document.getElementById("profileBio").value = p.bio || "";
+    openModal("profileModal");
+  });
+  document.getElementById("logoutButton").addEventListener("click",async() => {
+    await db.auth.signOut();
+    toast("Déconnecté");
+  });
+}
+
+document.getElementById("profileForm").addEventListener("submit",async e => {
+  e.preventDefault();
+  if (!requireAuth()) return;
+  const payload = {
+    display_name: document.getElementById("profileName").value.trim(),
+    username: normalizeUsername(document.getElementById("profileUsername").value),
+    bio: document.getElementById("profileBio").value.trim(),
+    updated_at: new Date().toISOString()
+  };
+  const { error } = await db.from("lion_profiles").update(payload).eq("id",currentUser.id);
+  if (error) return toast(error.message);
+  closeModal("profileModal");
+  await loadProfile();
+  updateAccountUI();
+  renderProfile();
+  await loadPosts();
+  toast("Profil mis à jour ✓");
+});
+
+// ---------- Solutions ----------
+function renderSolutions() {
+  const q = document.getElementById("solutionSearch").value.trim().toLowerCase();
+  const book = document.getElementById("solutionBook").value;
+  const result = solutions.filter(s => (!book || s.book === book) && `${s.book} ${s.page} ${s.result}`.toLowerCase().includes(q));
+  const grid = document.getElementById("solutionsGrid");
+
+  grid.innerHTML = result.map(s => `<article class="card">
+    <div class="form-note">${escapeHTML(s.book)}</div>
+    <h3 style="margin:5px 0 11px">${escapeHTML(s.page)}</h3>
+    <div class="spoiler" data-result="${escapeHTML(s.result)}" data-image="${escapeHTML(s.image || "")}">
+      <strong>Cliquer pour révéler</strong>
+    </div>
+  </article>`).join("") || `<div class="empty">Aucune solution trouvée.</div>`;
+
+  grid.querySelectorAll(".spoiler").forEach(spoiler => spoiler.addEventListener("click",(event) => {
+    if (event.target.closest(".solution-full-link")) return;
+
+    spoiler.classList.toggle("revealed");
+    if (!spoiler.classList.contains("revealed")) {
+      spoiler.innerHTML = `<strong>Cliquer pour révéler</strong>`;
+      return;
+    }
+
+    const image = spoiler.dataset.image;
+    if (image) {
+      spoiler.innerHTML = `
+        <div class="solution-reveal">
+          <img src="${image}" alt="${escapeHTML(spoiler.dataset.result)}" loading="lazy" referrerpolicy="no-referrer">
+          <div class="solution-caption">
+            <strong>${escapeHTML(spoiler.dataset.result)}</strong>
+            <a class="solution-full-link" href="${image}" target="_blank" rel="noopener noreferrer">Voir en grand ↗</a>
+          </div>
+        </div>`;
+    } else {
+      spoiler.innerHTML = `<strong>${escapeHTML(spoiler.dataset.result)}</strong>`;
+    }
+  }));
+}
+document.getElementById("solutionSearch").addEventListener("input",renderSolutions);
+document.getElementById("solutionBook").addEventListener("change",renderSolutions);
+
+// ---------- Palette ----------
+const palettes = {
+  royal:["#3D1830","#8C2443","#B98035","#E6C77A","#FFF0D0","#442D1E"],
+  pastel:["#F8D8DC","#EBDFF6","#DCECF7","#DDEEDB","#FFF0BF","#E9C8AA"],
+  jungle:["#19392F","#2F5D50","#56876D","#9EAD70","#D0B56A","#4A2C22"],
+  sunset:["#642A46","#A94651","#E56A54","#F4A261","#F6C778","#FFF0D0"]
+};
+const prefixes = {"Ohuhu":"OH","Crayola":"CR","Faber-Castell":"FC"};
+let currentPalette = [];
+
+function generatePalette() {
+  const brand = document.getElementById("brandSelect").value;
+  const mood = document.getElementById("moodSelect").value;
+  currentPalette = palettes[mood].map((hex,i) => ({hex,code:`${prefixes[brand]}-${String(i+1).padStart(2,"0")}`}));
+  document.getElementById("paletteResult").innerHTML = currentPalette.map(s => `<div class="swatch"><div class="swatch-color" style="background:${s.hex}"></div><small>${s.code}<br>${s.hex}</small></div>`).join("");
+}
+document.getElementById("generatePalette").addEventListener("click",generatePalette);
+document.getElementById("copyPalette").addEventListener("click",async() => {
+  const brand = document.getElementById("brandSelect").value;
+  const mood = document.getElementById("moodSelect").selectedOptions[0].text;
+  const text = `Palette Lion Dynasty — ${brand} — ${mood}\n${currentPalette.map(s=>`${s.code}: ${s.hex}`).join("\n")}\n#LionDynastyColoring`;
+  try { await navigator.clipboard.writeText(text); toast("Palette copiée ✓"); }
+  catch { toast("Copie non disponible dans ce navigateur"); }
+});
+
+// ---------- Pixel Art ----------
+let pixelImage = null;
+let pixelModel = null;
+const pixelCanvas = document.getElementById("pixelCanvas");
+const pctx = pixelCanvas.getContext("2d");
+
+function initPixel() {
+  drawPixelPlaceholder();
+}
+function drawPixelPlaceholder() {
+  pixelCanvas.width=640; pixelCanvas.height=430;
+  pctx.fillStyle="#fffaf2"; pctx.fillRect(0,0,640,430);
+  pctx.fillStyle="#77685d"; pctx.textAlign="center"; pctx.textBaseline="middle";
+  pctx.font="700 17px system-ui"; pctx.fillText("Importe une photo pour créer ta grille",320,205);
+  pctx.font="500 12px system-ui"; pctx.fillText("Les couleurs dominantes seront extraites de l’image",320,234);
+}
+function colorDistance(a,b) {
+  const dr=a[0]-b[0],dg=a[1]-b[1],db=a[2]-b[2];
+  return .30*dr*dr+.59*dg*dg+.11*db*db;
+}
+function avg(points) {
+  let r=0,g=0,b=0;
+  points.forEach(p=>{r+=p[0];g+=p[1];b+=p[2];});
+  const n=Math.max(1,points.length);
+  return [Math.round(r/n),Math.round(g/n),Math.round(b/n)];
+}
+function range(points,c) {
+  let mn=255,mx=0;
+  points.forEach(p=>{mn=Math.min(mn,p[c]);mx=Math.max(mx,p[c]);});
+  return mx-mn;
+}
+function medianCut(pixels,count) {
+  let boxes=[pixels.slice()];
+  while(boxes.length<count) {
+    let best=-1,score=-1,ch=0;
+    boxes.forEach((box,i)=>{
+      if(box.length<2)return;
+      const rs=[0,1,2].map(c=>range(box,c));
+      const cc=rs.indexOf(Math.max(...rs));
+      const s=Math.max(...rs)*Math.sqrt(box.length);
+      if(s>score){score=s;best=i;ch=cc;}
+    });
+    if(best<0)break;
+    const box=boxes.splice(best,1)[0].sort((a,b)=>a[ch]-b[ch]);
+    const mid=Math.floor(box.length/2);
+    boxes.push(box.slice(0,mid),box.slice(mid));
+  }
+  return boxes.map(avg);
+}
+function refine(pixels,palette,loops=8) {
+  let cs=palette.map(c=>c.slice());
+  for(let n=0;n<loops;n++){
+    const buckets=cs.map(()=>[]);
+    pixels.forEach(p=>{
+      let bi=0,
