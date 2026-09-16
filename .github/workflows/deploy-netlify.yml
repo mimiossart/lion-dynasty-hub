@@ -1,0 +1,18 @@
+name: Deploy Lion Dynasty to Netlify
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Deploy to Netlify
+        run: >-
+          npx -y @netlify/mcp@latest
+          --site-id f2f46f22-4901-45f7-95d1-9dcdc28d91c7
+          --proxy-path "https://netlify-mcp.netlify.app/proxy/eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..PFbvDD-DAqlOHHtX.e9y-pPvTbfuhdo7yQHLvij-gp2Bv6p0MQsHROHK4LurRuFnKsfCr_gy9iARIbEv6wyZFMignqnVSQ_DzXNlBLBc7HefvQ_Z8eEOE564bXbhVPLvuKQOd67SUmm3QEY1F-gkl3EdJAP0TYPQdEQxvAWglUSr9tAb34sqU-q1mEF5XliiG1FxOPYObhw1obEcDNBSPAUqEQbZ_F84Xz4ocWblv-Y_u5E39vdDd4aJGL6OKaEK8biqADzLUr7gzfnb_zd0Z4fdMpzcvTfDME6u7EGWDQkwKMYT4_V5AI43bKA_QGgcRDKUJqTykvtvknKnUoLPmmBiOWK20OgSLbLC2Y2xux4HxDzeernfUsWsgLluQ2jKbb1S7tGVHunqJezJBxEVAWzfZ.Ay79wOo_Wvn94rq1MMuE8w"
