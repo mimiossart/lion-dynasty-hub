@@ -1,0 +1,224 @@
+onst label = document.getElementById("accountLabel");
+  const icon = document.getElementById("accountIcon");
+  if (currentUser) {
+    label.textContent = "@" + (currentProfile?.username || "membre");
+    icon.textContent = initials(currentProfile?.display_name || currentUser.email).slice(0,1);
+  } else {
+    label.textContent = "Connexion";
+    icon.textContent = "♙";
+  }
+}
+
+async function handleSession(session) {
+  currentUser = session?.user || null;
+  await loadProfile();
+  updateAccountUI();
+  await loadTracker();
+  await loadPosts();
+  renderProfile();
+  setupRealtime();
+}
+
+async function initAuth() {
+  renderCollections();
+  renderSolutions();
+  generatePalette();
+  initPixel();
+
+  if (!db) {
+    updateAccountUI();
+    renderProfile();
+    renderGallery();
+    return;
+  }
+
+  const { data } = await db.auth.getSession();
+  await handleSession(data.session);
+
+  db.auth.onAuthStateChange(async (_event, session) => {
+    await handleSession(session);
+  });
+}
+
+// ---------- Tracker ----------
+function trackerKey(collectionId, page) {
+  return `${collectionId}|${page}`;
+}
+
+function renderCollections() {
+  const grid = document.getElementById("collectionGrid");
+  grid.innerHTML = "";
+
+  collections.forEach(col => {
+    const done = col.pages.filter(page => trackerState[trackerKey(col.id,page)]).length;
+    const pct = Math.round(done / col.pages.length * 100);
+    const card = document.createElement("article");
+    card.className = "card collection-card";
+    card.innerHTML = `
+      <div class="collection-top">
+        <div><h3>${escapeHTML(col.title)}</h3><div class="sync-note">${done}/${col.pages.length} terminés</div></div>
+        <span class="pill">${pct}%</span>
+      </div>
+      <div class="progress"><span style="width:${pct}%"></span></div>
+      <div class="check-list">
+        ${col.pages.map(page => {
+          const key = trackerKey(col.id,page);
+          return `<label class="check-item">
+            <input type="checkbox" data-key="${escapeHTML(key)}" ${trackerState[key] ? "checked" : ""}>
+            <span>${escapeHTML(page)}</span>
+          </label>`;
+        }).join("")}
+      </div>
+      <div class="sync-note">${currentUser ? "☁ Synchronisé avec ton compte" : "Connecte-toi pour synchroniser la progression"}</div>
+    `;
+    grid.appendChild(card);
+  });
+
+  grid.querySelectorAll("input[type=checkbox]").forEach(cb => {
+    cb.addEventListener("change", async () => {
+      if (!requireAuth()) {
+        cb.checked = !cb.checked;
+        return;
+      }
+      trackerState[cb.dataset.key] = cb.checked;
+      renderCollections();
+      renderProfile();
+
+      const { error } = await db.from("lion_tracker").upsert({
+        user_id: currentUser.id,
+        item_key: cb.dataset.key,
+        completed: cb.checked,
+        updated_at: new Date().toISOString()
+      }, { onConflict: "user_id,item_key" });
+
+      if (error) {
+        toast("La synchronisation a échoué");
+        console.warn(error);
+      } else toast("Progression synchronisée ✓");
+    });
+  });
+}
+
+async function loadTracker() {
+  trackerState = {};
+  if (!db || !currentUser) {
+    renderCollections();
+    return;
+  }
+  const { data, error } = await db.from("lion_tracker").select("item_key,completed").eq("user_id", currentUser.id);
+  if (error) console.warn(error);
+  (data || []).forEach(row => trackerState[row.item_key] = !!row.completed);
+  renderCollections();
+}
+
+function completedCount() {
+  return Object.values(trackerState).filter(Boolean).length;
+}
+
+// ---------- Community ----------
+async function loadPosts() {
+  document.getElementById("galleryLoading").style.display = "block";
+  if (!db) {
+    posts = [];
+    renderGallery();
+    document.getElementById("galleryLoading").style.display = "none";
+    return;
+  }
+
+  const { data: postRows, error } = await db
+    .from("lion_posts")
+    .select("id,user_id,title,book,page,material,description,image_path,image_url,created_at,author:lion_profiles!lion_posts_user_id_fkey(display_name,username)")
+    .order("created_at", { ascending:false })
+    .limit(100);
+
+  if (error) {
+    console.warn(error);
+    posts = [];
+    toast("Impossible de charger la galerie");
+    renderGallery();
+    document.getElementById("galleryLoading").style.display = "none";
+    return;
+  }
+
+  const ids = (postRows || []).map(p => p.id);
+  let likes = [];
+  let comments = [];
+
+  if (ids.length) {
+    const [{data: likeRows}, {data: commentRows}] = await Promise.all([
+      db.from("lion_likes").select("post_id,user_id").in("post_id", ids),
+      db.from("lion_comments")
+        .select("id,post_id,user_id,body,created_at,author:lion_profiles!lion_comments_user_id_fkey(display_name,username)")
+        .in("post_id", ids)
+        .order("created_at",{ascending:true})
+    ]);
+    likes = likeRows || [];
+    comments = commentRows || [];
+  }
+
+  posts = (postRows || []).map(p => ({
+    ...p,
+    likes: likes.filter(l => l.post_id === p.id),
+    comments: comments.filter(c => c.post_id === p.id)
+  }));
+
+  renderGallery();
+  renderProfile();
+  document.getElementById("galleryLoading").style.display = "none";
+}
+
+function filteredPosts() {
+  const q = document.getElementById("gallerySearch").value.trim().toLowerCase();
+  const book = document.getElementById("galleryBook").value;
+  const sort = document.getElementById("gallerySort").value;
+
+  let result = posts.filter(p => {
+    const author = p.author || {};
+    const hay = [p.title,p.book,p.page,p.material,p.description,author.display_name,author.username].join(" ").toLowerCase();
+    return (!q || hay.includes(q)) && (!book || p.book === book);
+  });
+
+  if (sort === "mine") result = currentUser ? result.filter(p => p.user_id === currentUser.id) : [];
+  if (sort === "popular") result = [...result].sort((a,b) => b.likes.length - a.likes.length);
+  else result = [...result].sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+
+  return result;
+}
+
+function renderGallery() {
+  const grid = document.getElementById("galleryGrid");
+  const result = filteredPosts();
+  document.getElementById("galleryCount").textContent = `${result.length} création${result.length > 1 ? "s" : ""}`;
+
+  if (!db) {
+    grid.innerHTML = `<div class="empty"><strong>Communauté momentanément indisponible.</strong><br>Réessaie dans quelques instants.</div>`;
+    return;
+  }
+  if (!result.length) {
+    grid.innerHTML = `<div class="empty">Aucune création pour ce filtre. ${currentUser ? "Tu peux publier la première ✦" : "Connecte-toi pour publier."}</div>`;
+    return;
+  }
+
+  grid.innerHTML = result.map(p => {
+    const author = p.author || {};
+    const liked = !!(currentUser && p.likes.some(l => l.user_id === currentUser.id));
+    return `<article class="post-card" data-post="${p.id}">
+      <div class="post-cover"><img src="${escapeHTML(p.image_url)}" alt="${escapeHTML(p.title)}" loading="lazy"></div>
+      <div class="post-body">
+        <div class="author-line">
+          <div class="avatar">${initials(author.display_name || "LD")}</div>
+          <div>
+            <div class="author-name">${escapeHTML(author.display_name || "Membre")}</div>
+            <div class="handle">@${escapeHTML(author.username || "membre")}</div>
+          </div>
+        </div>
+        <div class="post-title">${escapeHTML(p.title)}</div>
+        <div class="post-meta">
+          <span>${escapeHTML(p.book)}</span><span>•</span><span>${escapeHTML(p.page)}</span>
+          ${p.material ? `<span>•</span><span>${escapeHTML(p.material)}</span>` : ""}
+        </div>
+        ${p.description ? `<p class="post-desc">${escapeHTML(p.description)}</p>` : ""}
+        <div class="action-row">
+          <button class="icon-btn like-btn ${liked ? "liked" : ""}" data-id="${p.id}" type="button">${liked ? "♥" : "♡"} ${p.likes.length}</button>
+          <button class="icon-btn comment-toggle" data-id="${p.id}" type="button">💬 ${p.comments.length}</button>
+          ${currentUser && p.user_id === currentUser.id ? `<button class="icon-btn push delete-post" data-id="${p.id}"
