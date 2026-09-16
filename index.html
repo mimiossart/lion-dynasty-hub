@@ -6,154 +6,33 @@
   <meta name="theme-color" content="#24170e">
   <title>Lion Dynasty — Hub des Coloristes V4</title>
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="example-mode.css">
+  <style>
+    .example-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fffdf8}
+    .example-controls[hidden]{display:none}.example-controls label{font-size:11px;font-weight:850;color:#6b594b}.example-controls .field{margin-top:5px}
+    @media(max-width:600px){.example-controls{grid-template-columns:1fr}}
+  </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
 </head>
 <body>
-  <nav class="nav">
-    <div class="shell nav-inner">
-      <a class="brand" href="#home">
-        <span class="crest">♛</span>
-        <span>Lion Dynasty<small>Coloring Hub</small></span>
-      </a>
-      <div class="nav-links">
-        <a href="#tracker">Tracker</a>
-        <a href="#gallery">Galerie</a>
-        <a href="#profile">Profil</a>
-        <a href="#solutions">Solutions</a>
-        <a href="#tools">Outils</a>
-      </div>
-      <button class="account-btn" id="accountButton" type="button">
-        <span id="accountIcon">♙</span><span id="accountLabel">Connexion</span>
-      </button>
-    </div>
-  </nav>
+  <nav class="nav"><div class="shell nav-inner"><a class="brand" href="#home"><span class="crest">♛</span><span>Lion Dynasty<small>Coloring Hub</small></span></a><div class="nav-links"><a href="#tracker">Tracker</a><a href="#gallery">Galerie</a><a href="#profile">Profil</a><a href="#solutions">Solutions</a><a href="#tools">Outils</a></div><button class="account-btn" id="accountButton" type="button"><span id="accountIcon">♙</span><span id="accountLabel">Connexion</span></button></div></nav>
 
-  <header class="hero" id="home">
-    <div class="shell hero-grid">
-      <div>
-        <span class="eyebrow">✦ V4 — Communauté synchronisée</span>
-        <h1>Colorier.<br>Partager.<br>Se retrouver.</h1>
-        <p>Le Hub Lion Dynasty devient une vraie plateforme communautaire : comptes membres, galerie commune, likes, commentaires, photos hébergées et tracker synchronisé sur tous les appareils.</p>
-        <div class="cta-row">
-          <a class="btn btn-primary" href="#gallery">Découvrir la communauté</a>
-          <button class="btn btn-secondary" id="heroAccount" type="button">Créer mon compte</button>
-        </div>
-      </div>
-      <aside class="hero-card">
-        <span class="eyebrow inverse">#LionDynastyColoring</span>
-        <h2>Une progression.<br>Tous tes appareils.</h2>
-        <p>Connecte-toi sur mobile, tablette ou ordinateur : tes coloriages cochés et tes publications te suivent partout.</p>
-        <div class="stats">
-          <div class="stat"><strong>☁</strong><span>Synchronisé</span></div>
-          <div class="stat"><strong>♡</strong><span>Communautaire</span></div>
-          <div class="stat"><strong>🔒</strong><span>RLS sécurisé</span></div>
-        </div>
-      </aside>
-    </div>
-  </header>
+  <header class="hero" id="home"><div class="shell hero-grid"><div><span class="eyebrow">✦ V4 — Communauté synchronisée</span><h1>Colorier.<br>Partager.<br>Se retrouver.</h1><p>Le Hub Lion Dynasty devient une vraie plateforme communautaire : comptes membres, galerie commune, likes, commentaires, photos hébergées et tracker synchronisé sur tous les appareils.</p><div class="cta-row"><a class="btn btn-primary" href="#gallery">Découvrir la communauté</a><button class="btn btn-secondary" id="heroAccount" type="button">Créer mon compte</button></div></div><aside class="hero-card"><span class="eyebrow inverse">#LionDynastyColoring</span><h2>Une progression.<br>Tous tes appareils.</h2><p>Connecte-toi sur mobile, tablette ou ordinateur : tes coloriages cochés et tes publications te suivent partout.</p><div class="stats"><div class="stat"><strong>☁</strong><span>Synchronisé</span></div><div class="stat"><strong>♡</strong><span>Communautaire</span></div><div class="stat"><strong>🔒</strong><span>RLS sécurisé</span></div></div></aside></div></header>
 
   <main>
-    <section class="section" id="tracker">
-      <div class="shell">
-        <div class="section-head">
-          <div><span class="eyebrow">01 — Collection</span><h2>Tracker synchronisé</h2></div>
-          <p>Une fois connecté, chaque case cochée est enregistrée dans ton compte Supabase et retrouvée sur tes autres appareils.</p>
-        </div>
-        <div class="grid-3" id="collectionGrid"></div>
-      </div>
-    </section>
+    <section class="section" id="tracker"><div class="shell"><div class="section-head"><div><span class="eyebrow">01 — Collection</span><h2>Tracker synchronisé</h2></div><p>Une fois connecté, chaque case cochée est enregistrée dans ton compte Supabase et retrouvée sur tes autres appareils.</p></div><div class="grid-3" id="collectionGrid"></div></div></section>
 
-    <section class="section" id="gallery">
-      <div class="shell">
-        <div class="section-head">
-          <div><span class="eyebrow">02 — Communauté</span><h2>Le Mur des Chefs-d’œuvre</h2></div>
-          <p>Les publications, likes et commentaires sont partagés entre tous les membres du Hub.</p>
-        </div>
-        <div class="publish-callout">
-          <div><strong>Ta création mérite sa place ici ✦</strong><p>Publie une photo, indique le livre, la page et le matériel utilisé.</p></div>
-          <button class="btn light" id="openPublish" type="button">＋ Publier</button>
-        </div>
-        <div class="community-bar">
-          <input class="field" id="gallerySearch" placeholder="Rechercher un membre, un livre, une page…">
-          <select class="field" id="galleryBook"><option value="">Tous les livres</option><option>Tome 1 Disney</option><option>Grands Classiques</option><option>Animaux Royaux</option></select>
-          <select class="field" id="gallerySort"><option value="recent">Plus récents</option><option value="popular">Plus aimés</option><option value="mine">Mes publications</option></select>
-          <span class="pill" id="galleryCount">0 créations</span>
-        </div>
-        <div class="loading" id="galleryLoading">Chargement de la communauté…</div>
-        <div class="gallery" id="galleryGrid"></div>
-      </div>
-    </section>
+    <section class="section" id="gallery"><div class="shell"><div class="section-head"><div><span class="eyebrow">02 — Communauté</span><h2>Le Mur des Chefs-d’œuvre</h2></div><p>Les publications, likes et commentaires sont partagés entre tous les membres du Hub.</p></div><div class="publish-callout"><div><strong>Ta création mérite sa place ici ✦</strong><p>Publie une photo, indique le livre, la page et le matériel utilisé.</p></div><button class="btn light" id="openPublish" type="button">＋ Publier</button></div><div class="community-bar"><input class="field" id="gallerySearch" placeholder="Rechercher un membre, un livre, une page…"><select class="field" id="galleryBook"><option value="">Tous les livres</option><option>Tome 1 Disney</option><option>Grands Classiques</option><option>Animaux Royaux</option></select><select class="field" id="gallerySort"><option value="recent">Plus récents</option><option value="popular">Plus aimés</option><option value="mine">Mes publications</option></select><span class="pill" id="galleryCount">0 créations</span></div><div class="loading" id="galleryLoading">Chargement de la communauté…</div><div class="gallery" id="galleryGrid"></div></div></section>
 
-    <section class="section" id="profile">
-      <div class="shell">
-        <div class="section-head"><div><span class="eyebrow">03 — Membre</span><h2>Mon Profil</h2></div><p>Ton identité publique, tes statistiques et tes dernières publications.</p></div>
-        <div id="profileContent"></div>
-      </div>
-    </section>
+    <section class="section" id="profile"><div class="shell"><div class="section-head"><div><span class="eyebrow">03 — Membre</span><h2>Mon Profil</h2></div><p>Ton identité publique, tes statistiques et tes dernières publications.</p></div><div id="profileContent"></div></div></section>
 
-    <section class="section" id="solutions">
-      <div class="shell">
-        <div class="section-head"><div><span class="eyebrow">04 — Spoilers</span><h2>Les Solutions</h2></div><p>Recherche une page puis révèle uniquement le spoiler souhaité.</p></div>
-        <div class="tool-row">
-          <input class="field" id="solutionSearch" placeholder="Rechercher : Tome 1, page 12…">
-          <select class="field" id="solutionBook"><option value="">Tous les livres</option><option>Tome 1 Disney</option><option>Grands Classiques</option><option>Animaux Royaux</option></select>
-        </div>
-        <div class="grid-3" id="solutionsGrid" style="margin-top:16px"></div>
-      </div>
-    </section>
+    <section class="section" id="solutions"><div class="shell"><div class="section-head"><div><span class="eyebrow">04 — Spoilers</span><h2>Les Solutions</h2></div><p>Recherche une page puis révèle uniquement le spoiler souhaité.</p></div><div class="tool-row"><input class="field" id="solutionSearch" placeholder="Rechercher : Tome 1, page 12…"><select class="field" id="solutionBook"><option value="">Tous les livres</option><option>Tome 1 Disney</option><option>Grands Classiques</option><option>Animaux Royaux</option></select></div><div class="grid-3" id="solutionsGrid" style="margin-top:16px"></div></div></section>
 
-    <section class="section" id="tools">
-      <div class="shell">
-        <div class="section-head">
-          <div><span class="eyebrow">05 — Viral Lab</span><h2>Outils & Générateurs</h2></div>
-          <p>Nuancier partageable et convertisseur de photo en coloriage mystère, avec un Mode Exemple proche d’une vraie page de coloriage imprimable.</p>
-        </div>
-        <div class="tool-grid">
-          <article class="card">
-            <h3>Générateur de Nuanciers</h3>
-            <p>Choisis une marque et une ambiance pour créer une palette prête à partager.</p>
-            <div class="tool-row">
-              <select class="field" id="brandSelect"><option>Ohuhu</option><option>Crayola</option><option>Faber-Castell</option></select>
-              <select class="field" id="moodSelect"><option value="royal">Royal & doré</option><option value="pastel">Pastel doux</option><option value="jungle">Jungle profonde</option><option value="sunset">Coucher de soleil</option></select>
-            </div>
-            <button class="btn btn-primary full" id="generatePalette" type="button">Générer ma palette</button>
-            <div class="palette" id="paletteResult"></div>
-            <button class="btn btn-secondary full" id="copyPalette" type="button">Copier pour TikTok</button>
-            <div class="form-note">Les références de feutres restent des identifiants de démonstration jusqu’à l’intégration du catalogue officiel.</div>
-          </article>
+    <section class="section" id="tools"><div class="shell"><div class="section-head"><div><span class="eyebrow">05 — Viral Lab</span><h2>Outils & Générateurs</h2></div><p>Nuancier partageable et convertisseur de photo en coloriage mystère, avec un Mode Exemple proche d’une vraie page de coloriage imprimable.</p></div><div class="tool-grid">
+      <article class="card"><h3>Générateur de Nuanciers</h3><p>Choisis une marque et une ambiance pour créer une palette prête à partager.</p><div class="tool-row"><select class="field" id="brandSelect"><option>Ohuhu</option><option>Crayola</option><option>Faber-Castell</option></select><select class="field" id="moodSelect"><option value="royal">Royal & doré</option><option value="pastel">Pastel doux</option><option value="jungle">Jungle profonde</option><option value="sunset">Coucher de soleil</option></select></div><button class="btn btn-primary full" id="generatePalette" type="button">Générer ma palette</button><div class="palette" id="paletteResult"></div><button class="btn btn-secondary full" id="copyPalette" type="button">Copier pour TikTok</button><div class="form-note">Les références de feutres restent des identifiants de démonstration jusqu’à l’intégration du catalogue officiel.</div></article>
 
-          <article class="card">
-            <h3>Convertisseur Coloriage Mystère</h3>
-            <p>Importe une photo et transforme-la en page de coloriage. Le Mode Exemple crée des traits fins, des formes fusionnées et des zones numérotées sans quadrillage visible.</p>
-            <input class="field" id="pixelUpload" type="file" accept="image/*">
-            <div class="tool-row">
-              <label>Définition<select class="field" id="gridSize"><option value="24">24 cases — simple</option><option value="32">32 cases — équilibré</option><option value="48">48 cases — détaillé</option><option value="64" selected>64 cases — portrait précis</option><option value="80">80 cases — très détaillé</option></select></label>
-              <label>Couleurs<select class="field" id="colorCount"><option value="4">4 couleurs</option><option value="6">6 couleurs</option><option value="8">8 couleurs</option><option value="10">10 couleurs</option><option value="12" selected>12 couleurs</option><option value="16">16 couleurs</option></select></label>
-            </div>
-            <select class="field" id="pixelMode">
-              <option value="example-numbered" selected>Mode Exemple — contour + numéros</option>
-              <option value="example-line">Mode Exemple — contour seul</option>
-              <option value="line-numbered">Dessin sans carrés — zones numérotées</option>
-              <option value="line-only">Dessin sans carrés — contours seuls</option>
-              <option value="mystery">Grille mystère numérotée</option>
-              <option value="color">Aperçu couleur</option>
-            </select>
-            <div class="example-controls" id="exampleControls">
-              <label>Complexité<select class="field" id="exampleComplexity"><option value="low">Faible — grandes zones</option><option value="medium" selected>Moyenne — équilibrée</option><option value="high">Élevée — plus de détails</option></select></label>
-              <label>Fusion des petites zones<select class="field" id="exampleMerge"><option value="medium">Moyenne</option><option value="strong" selected>Forte</option></select></label>
-              <label>Trait<select class="field" id="exampleStrokeWidth"><option value="fine" selected>Fin</option><option value="medium">Moyen</option></select></label>
-              <label>Couleur du trait<select class="field" id="exampleStrokeColor"><option value="light" selected>Gris clair</option><option value="medium">Gris moyen</option><option value="dark">Noir doux</option></select></label>
-            </div>
-            <div class="canvas-wrap"><canvas id="pixelCanvas" width="640" height="430"></canvas></div>
-            <div class="palette" id="pixelLegend"></div>
-            <div class="form-note" id="pixelInfo">Importe une photo pour commencer.</div>
-            <div class="cta-row compact"><button class="btn btn-primary" id="printPixel" type="button">Imprimer</button><button class="btn btn-secondary" id="downloadPixel" type="button">PNG</button></div>
-          </article>
-        </div>
-      </div>
-    </section>
+      <article class="card"><h3>Convertisseur Coloriage Mystère</h3><p>Importe une photo et transforme-la en page de coloriage. Le Mode Exemple crée des traits fins, des formes fusionnées et des zones numérotées sans quadrillage visible.</p><input class="field" id="pixelUpload" type="file" accept="image/*"><div class="tool-row"><label>Définition<select class="field" id="gridSize"><option value="24">24 cases — simple</option><option value="32">32 cases — équilibré</option><option value="48">48 cases — détaillé</option><option value="64" selected>64 cases — portrait précis</option><option value="80">80 cases — très détaillé</option></select></label><label>Couleurs<select class="field" id="colorCount"><option value="4">4 couleurs</option><option value="6">6 couleurs</option><option value="8">8 couleurs</option><option value="10">10 couleurs</option><option value="12" selected>12 couleurs</option><option value="16">16 couleurs</option></select></label></div><select class="field" id="pixelMode"><option value="example-numbered" selected>Mode Exemple — contour + numéros</option><option value="example-line">Mode Exemple — contour seul</option><option value="line-numbered">Dessin sans carrés — zones numérotées</option><option value="line-only">Dessin sans carrés — contours seuls</option><option value="mystery">Grille mystère numérotée</option><option value="color">Aperçu couleur</option></select><div class="example-controls" id="exampleControls"><label>Complexité<select class="field" id="exampleComplexity"><option value="low">Faible — grandes zones</option><option value="medium" selected>Moyenne — équilibrée</option><option value="high">Élevée — plus de détails</option></select></label><label>Fusion des petites zones<select class="field" id="exampleMerge"><option value="medium">Moyenne</option><option value="strong" selected>Forte</option></select></label><label>Trait<select class="field" id="exampleStrokeWidth"><option value="fine" selected>Fin</option><option value="medium">Moyen</option></select></label><label>Couleur du trait<select class="field" id="exampleStrokeColor"><option value="light" selected>Gris clair</option><option value="medium">Gris moyen</option><option value="dark">Noir doux</option></select></label></div><div class="canvas-wrap"><canvas id="pixelCanvas" width="640" height="430"></canvas></div><div class="palette" id="pixelLegend"></div><div class="form-note" id="pixelInfo">Importe une photo pour commencer.</div><div class="cta-row compact"><button class="btn btn-primary" id="printPixel" type="button">Imprimer</button><button class="btn btn-secondary" id="downloadPixel" type="button">PNG</button></div></article>
+    </div></div></section>
   </main>
 
   <footer class="footer"><div class="shell footer-inner"><strong>Lion Dynasty Coloring Hub — V4</strong><span>Le Hub communautaire des passionnés de coloriage</span></div></footer>
@@ -166,6 +45,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="app.js"></script>
-  <script src="example-mode.js"></script>
+  <script src="payload2.js"></script>
 </body>
 </html>
