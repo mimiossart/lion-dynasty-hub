@@ -17,8 +17,6 @@
     if (!legacyHasControl || v53Active || reloading) return;
     reloading = true;
 
-    // L'ancien convertisseur asynchrone vient de finir. On relance V5.3 maintenant,
-    // afin qu'il soit définitivement le dernier moteur à prendre la main.
     window.__LION_EDITORIAL_V53__ = false;
     const script = document.createElement('script');
     script.src = `editorial-mode-v53.js?v=57-${Date.now()}`;
@@ -36,8 +34,17 @@
   setTimeout(() => repair(), 5000);
 })();
 
+// V5.17 : ajoute le nuancier numéro / couleur / HEX dans les SVG exportés.
+setTimeout(() => {
+  if (window.__LION_SVG_NUANCIER_LOADER_V517__) return;
+  window.__LION_SVG_NUANCIER_LOADER_V517__ = true;
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/gh/mimiossart/lion-dynasty-hub@f094e58e4f5b58805346017c4eb2a17b49c36487/svg-nuancier-v517.js';
+  script.crossOrigin = 'anonymous';
+  document.body.appendChild(script);
+}, 50);
+
 // V5.16 : moteur séparé Paint by Numbers détaillé (SVG).
-// Il charge tôt, puis attend lui-même que V5.3 ait fini ses reprises de contrôle.
 setTimeout(() => {
   if (window.__LION_SVG_LOADER_V516__) return;
   window.__LION_SVG_LOADER_V516__ = true;
